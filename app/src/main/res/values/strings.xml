@@ -17,7 +17,7 @@
     <string name="signout_fail_null">Please enter your email and password</string>
 
     <!-- Bottom Navigation View -->
-    <string name="home">home</string>
+    <string name="home">Home</string>
     <string name="search">Search</string>
     <string name="gallery">Gallery</string>
     <string name="favorite">Favorite</string>

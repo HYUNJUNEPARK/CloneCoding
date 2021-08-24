@@ -1,7 +1,6 @@
 package com.june.insta
 
 import android.content.Intent
-import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Base64
@@ -77,9 +76,9 @@ class LoginActivity : AppCompatActivity() {
                 Log.i("hashkey", "printHashKey() Hash Key: $hashKey")
             }
         } catch (e: NoSuchAlgorithmException) {
-            Log.e("hashkey", "printHashKey()", e)
+            Log.e("err", "Can not print HashKey : NoSuchAlgorithmException", e)
         } catch (e: Exception) {
-            Log.e("hashkey", "printHashKey()", e)
+            Log.e("err", "Can not print HashKey", e)
         }
     }//fun
 
@@ -94,10 +93,8 @@ class LoginActivity : AppCompatActivity() {
                 //로그인 성공 시 정보를 파이어베이스에 넘김
                 handleFacebookAcessToken(result?.accessToken)
             }
-
             override fun onCancel() {
             }
-
             override fun onError(error: FacebookException?) {
             }
         })
@@ -111,7 +108,7 @@ class LoginActivity : AppCompatActivity() {
                 //Login
                 moveMainPage(task.result?.user)
             } else {
-                Log.d("err", "[ Login Failed_firebaseAuthWithGoogle ]")
+                Log.d("err", "[ Login Failed at handleFacebookAcessToken ]")
                 Toast.makeText(this, task.exception!!.message, Toast.LENGTH_SHORT).show()
             }
         }
@@ -146,7 +143,7 @@ class LoginActivity : AppCompatActivity() {
                 //Login
                 moveMainPage(task.result?.user)
             } else {
-                Log.d("err", "[ Login Failed_firebaseAuthWithGoogle ]")
+                Log.d("err", "[ Login Failed at firebaseAuthWithGoogle ]")
                 Toast.makeText(this, task.exception!!.message, Toast.LENGTH_SHORT).show()
             }
         }
@@ -161,7 +158,7 @@ class LoginActivity : AppCompatActivity() {
             if (task.isSuccessful) {
                 moveMainPage(task.result?.user)
             } else if (task.exception?.message.isNullOrEmpty()) {
-                Log.d("err", "[ Login Failed_signinAndSignup ]")
+                Log.d("err", "[ Login Failed at signinAndSignup ]")
                 Toast.makeText(this, task.exception!!.message, Toast.LENGTH_SHORT).show()
             } else {
                 signinEmail()
@@ -178,7 +175,7 @@ class LoginActivity : AppCompatActivity() {
                 //Login
                 moveMainPage(task.result?.user)
             } else {
-                Log.d("err", "[ Login Failed_signinEmail ]")
+                Log.d("err", "[ Login Failed at signinEmail ]")
                 Toast.makeText(this, task.exception!!.message, Toast.LENGTH_SHORT).show()
             }
         }
