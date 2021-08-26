@@ -1,14 +1,18 @@
 package com.june.insta
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.june.insta.navigation.AlarmFragment
-import com.june.insta.navigation.DetailViewFragment
-import com.june.insta.navigation.GridFragment
-import com.june.insta.navigation.UserFragment
+import com.june.insta.navigation.*
 import kotlinx.android.synthetic.main.activity_main.*
+
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,8 +20,13 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         setContentView(R.layout.activity_main)
 
         bottom_navigation.setOnNavigationItemSelectedListener(this)
+
+        //사진 권한을 요청
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 1)
+
     }//onCreate
 
+    // 네이게이션바
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.action_home -> {
@@ -33,6 +42,10 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             }//search
 
             R.id.action_add_photo -> {
+                //외부 스토리지를 갖고 올 수 있는 권한이 있다면
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+                    startActivity(Intent(this, AddPhotoActivitiy::class.java))
+                }
                 return true
             }//photo
 

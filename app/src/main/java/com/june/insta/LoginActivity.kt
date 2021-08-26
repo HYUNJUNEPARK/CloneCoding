@@ -73,12 +73,12 @@ class LoginActivity : AppCompatActivity() {
                 val md = MessageDigest.getInstance("SHA")
                 md.update(signature.toByteArray())
                 val hashKey: String = String(Base64.encode(md.digest(), 0))
-                Log.i("hashkey", "printHashKey() Hash Key: $hashKey")
+                Log.i("log", "printHashKey() Hash Key: $hashKey")
             }
         } catch (e: NoSuchAlgorithmException) {
-            Log.e("err", "Can not print HashKey : NoSuchAlgorithmException", e)
+            Log.e("log", "Can not print HashKey : NoSuchAlgorithmException", e)
         } catch (e: Exception) {
-            Log.e("err", "Can not print HashKey", e)
+            Log.e("log", "Can not print HashKey", e)
         }
     }//fun
 
@@ -108,7 +108,7 @@ class LoginActivity : AppCompatActivity() {
                 //Login
                 moveMainPage(task.result?.user)
             } else {
-                Log.d("err", "[ Login Failed at handleFacebookAcessToken ]")
+                Log.d("log", "[ Login Failed at handleFacebookAcessToken ]")
                 Toast.makeText(this, task.exception!!.message, Toast.LENGTH_SHORT).show()
             }
         }
@@ -143,7 +143,7 @@ class LoginActivity : AppCompatActivity() {
                 //Login
                 moveMainPage(task.result?.user)
             } else {
-                Log.d("err", "[ Login Failed at firebaseAuthWithGoogle ]")
+                Log.d("log", "[ Login Failed at firebaseAuthWithGoogle ]")
                 Toast.makeText(this, task.exception!!.message, Toast.LENGTH_SHORT).show()
             }
         }
@@ -158,7 +158,7 @@ class LoginActivity : AppCompatActivity() {
             if (task.isSuccessful) {
                 moveMainPage(task.result?.user)
             } else if (task.exception?.message.isNullOrEmpty()) {
-                Log.d("err", "[ Login Failed at signinAndSignup ]")
+                Log.d("log", "[ Login Failed at signinAndSignup ]")
                 Toast.makeText(this, task.exception!!.message, Toast.LENGTH_SHORT).show()
             } else {
                 signinEmail()
@@ -175,7 +175,7 @@ class LoginActivity : AppCompatActivity() {
                 //Login
                 moveMainPage(task.result?.user)
             } else {
-                Log.d("err", "[ Login Failed at signinEmail ]")
+                Log.d("log", "[ Login Failed at signinEmail ]")
                 Toast.makeText(this, task.exception!!.message, Toast.LENGTH_SHORT).show()
             }
         }
