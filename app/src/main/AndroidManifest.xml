@@ -16,7 +16,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".navigation.AddPhotoActivitiy"></activity>
 
-        <!-- 페이스북 로그인을 위해 추가된 메타 데이터 -->
+        <!-- 페이스북 로그인 웹뷰액티비티를 위해 추가된 메타 데이터 -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
