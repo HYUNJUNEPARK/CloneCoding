@@ -51,7 +51,7 @@ class LoginActivity : AppCompatActivity() {
         }//setOnClickListener
 
         facebook_login_button.setOnClickListener {
-            //facebook login 1step
+            //1step
             facebookLogin()
         }
 
@@ -89,7 +89,7 @@ class LoginActivity : AppCompatActivity() {
         //페이스북 로그인에 성공했을 때 넘어오는 부분
         LoginManager.getInstance().registerCallback(callbackManager, object : FacebookCallback<LoginResult>{
             override fun onSuccess(result: LoginResult?) {
-                //facebook login 2step
+                //2step
                 //로그인 성공 시 정보를 파이어베이스에 넘김
                 handleFacebookAcessToken(result?.accessToken)
             }
@@ -104,7 +104,7 @@ class LoginActivity : AppCompatActivity() {
         var credential = FacebookAuthProvider.getCredential(token?.token!!)
         auth?.signInWithCredential(credential)?.addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                //facebook login 3step
+                //3step
                 //Login
                 moveMainPage(task.result?.user)
             } else {

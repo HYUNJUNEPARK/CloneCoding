@@ -20,9 +20,10 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         setContentView(R.layout.activity_main)
 
         bottom_navigation.setOnNavigationItemSelectedListener(this)
-
         //사진 권한을 요청
         ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 1)
+        //디테일 뷰 프레그먼트
+        bottom_navigation.selectedItemId = R.id.action_home
 
     }//onCreate
 
