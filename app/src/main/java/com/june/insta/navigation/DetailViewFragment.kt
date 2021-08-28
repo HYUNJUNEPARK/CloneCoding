@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.june.insta.R
 import com.june.insta.navigation.model.ContentDTO
@@ -16,10 +17,13 @@ import kotlinx.android.synthetic.main.item_detail.view.*
 
 class DetailViewFragment : Fragment() {
     var firestore: FirebaseFirestore? = null
+    var uid : String? = null
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = LayoutInflater.from(activity).inflate(R.layout.fragment_detail, container, false)
         firestore = FirebaseFirestore.getInstance()
+        uid = FirebaseAuth.getInstance().currentUser?.uid
 
         view.detailviewfragment_recyclerview.adapter = DetailViewRecyclerViewAdapter()
         view.detailviewfragment_recyclerview.layoutManager = LinearLayoutManager(activity)
@@ -58,11 +62,40 @@ class DetailViewFragment : Fragment() {
             Glide.with(holder.itemView.context).load(contentDTOs!![position].imageUrl).into(viewholder.detailviewitem_imageview_content)
             viewholder.detailviewitem_explain_textview.text = contentDTOs!![position].explain
             viewholder.detailviewitem_favoritecounter_textview.text = "Likes " + contentDTOs!![position].favoriteCount
-            //Glide.with(holder.itemView.context).load(contentDTOs!![position].imageUrl).into(viewholder.detailviewitem_profile_image)
+
+            viewholder.detailviewitem_favorite_imageview.setOnClickListener {
+                favoriteEvent(position)
+            }
+
+            //좋아요가 눌렸을 때 하트색을 바꿔줌
+            if(contentDTOs!![position].favorites.containsKey(uid)){
+                viewholder.detailviewitem_favorite_imageview.setImageResource(R.drawable.ic_favorite)
+            }else{
+                viewholder.detailviewitem_favorite_imageview.setImageResource(R.drawable.ic_favorite_border)
+            }
         }//onBindViewHolder
 
         override fun getItemCount(): Int {
             return contentDTOs.size
         }//getItemCount
+
+        fun favoriteEvent(position : Int){
+            var tsDoc = firestore?.collection("images")?.document(contentUidList[position])
+            firestore?.runTransaction { transaction ->
+
+                var contentDTO = transaction.get(tsDoc!!).toObject(ContentDTO::class.java)
+
+                //containkey 가 되어있다는 것은 좋아요 버튼이 눌려있다는 것으로 버튼을 한번 더 누르면 좋아요가 취소됨
+                if (contentDTO!!.favorites.containsKey(uid)){
+                    contentDTO.favoriteCount = contentDTO.favoriteCount -1
+                    contentDTO.favorites.remove(uid)
+                }else{
+                    contentDTO.favoriteCount = contentDTO.favoriteCount +1
+                    contentDTO.favorites[uid!!] = true
+                }
+                //트랜잭션을 다시 서버로 돌려줌
+                transaction.set(tsDoc, contentDTO)
+            }
+        }
     }//inner class
 }//class
