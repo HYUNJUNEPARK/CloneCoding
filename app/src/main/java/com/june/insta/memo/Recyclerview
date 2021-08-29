@@ -1,4 +1,9 @@
-리사이클러뷰
+** 리사이클러뷰 구성요소 **
+어댑터(Adapter) : 사용자 데이터 리스트로부터 아이템 뷰를 만들어 리사이클러뷰에 표시
+뷰홀더(ViewHolder) : 어댑터를 통해 만들어진 아이템 뷰를 저장. 어댑터에서 생성, 관리되고 재활용되어 자원을 효율적으로 사용함
+레이아웃매니저(Layout Manager) : Vertical, Horizontal, Grid 등 아이템뷰들이 리사이클러뷰 내부에 배치되는 형태를 관리
+
+** 리사이클러뷰 사용 절차 **
 1. 레이아웃에 리사이클러뷰 생성 (fragment_detail.xml)
 2. 리사이클러뷰 한 줄 마다 들어갈 아이템 레이아웃 생성 (item_detail.xml)
 
@@ -18,3 +23,8 @@ getItemCount
 3. 프레그먼트 페이지에 Fragment()를 상속시키고(DetailViewFragment.kt) onCreateView 에
 LayoutInflater 를 이용해 리사이클러뷰 레이아웃을 담은 view 인스턴스를 만듬
 view 인스턴스에 어댑터(DetailViewRecyclerViewAdapter) 와 레이아웃 매니저(LinearLayoutManager)를 장착시키고 return
+
+
+
+
+

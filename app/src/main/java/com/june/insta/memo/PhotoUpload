@@ -3,7 +3,7 @@ build.gradle(...app) 에 implementation 'com.google.firebase:firebase-storage:16
 manifests 에 스토리지 접근을 할 수 있도록 <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/> 추가
 파이어베이스 Build -> Storage -> Get Started 로 스토리지 활성화
 
-** 업로드 과정 **
+** 업로드 절차 **
 - AddPhotoActivity 가 열렸을 때 -
 1. Activity 가 열릴 때(onCreate) 암묵적 인텐트에 requestCode 를 넣어서 보냄
 -> 안드로이드 기기 내 이미지를 처리할 수 있는 Activity 가 뜨는데 여기서 이미지를 선택하면 requestCode, resultCode, data를 받을 수 있음

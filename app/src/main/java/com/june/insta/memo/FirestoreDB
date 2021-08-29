@@ -30,14 +30,3 @@ Tools -> Firebase -> Cloud Firestore -> Get started with Cloud Firestore [Kotlin
 implementation 'com.google.firebase:firebase-firestore:18.0.0'
 >> 수정
 implementation 'com.google.firebase:firebase-firestore-ktx:23.0.3'
-
-
-
-
-
-
-
-업로드 방식
-1_ 콜백 방식
-2_ 프로미스 방식
-가독성이 더 좋은것 사용(단 구글에서는 프로미스 방식을 권장)
