@@ -37,11 +37,14 @@ class DetailViewFragment : Fragment() {
             firestore?.collection("images")?.orderBy("timestamp")?.addSnapshotListener { querySnapshot, firebaseFirestoreException ->
                     contentDTOs.clear()
                     contentUidList.clear()
+                    if (querySnapshot == null) return@addSnapshotListener
+
                     for (snapshot in querySnapshot!!.documents) {
                         var item = snapshot.toObject(ContentDTO::class.java)
                         contentDTOs.add(item!!)
                         contentUidList.add(snapshot.id)
                     }
+                    //리사이클러뷰 새로고침
                     notifyDataSetChanged()
                 }
         }//init
@@ -70,6 +73,16 @@ class DetailViewFragment : Fragment() {
                 viewholder.detailviewitem_favorite_imageview.setImageResource(R.drawable.ic_favorite)
             }else{
                 viewholder.detailviewitem_favorite_imageview.setImageResource(R.drawable.ic_favorite_border)
+            }
+
+            //프로필 이미지가 클릭됐을 때
+            viewholder.detailviewitem_profile_image.setOnClickListener {
+                var fragment = UserFragment()
+                var bundle = Bundle()
+                bundle.putString("destinationUid", contentDTOs[position].uid)
+                bundle.putString("userId", contentDTOs[position].userId)
+                fragment.arguments = bundle
+                activity?.supportFragmentManager?.beginTransaction()?.replace(R.id.main_content, fragment)?.commit()
             }
         }//onBindViewHolder
 

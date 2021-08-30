@@ -43,12 +43,12 @@ class LoginActivity : AppCompatActivity() {
         //이메일 로그인
         email_login_button.setOnClickListener {
             signinAndSignup()
-        }//setOnClickListener
+        }
 
         //SNS 로그인 1STEP
         google_sign_in_button.setOnClickListener {
             googleLogin()
-        }//setOnClickListener
+        }
 
         facebook_login_button.setOnClickListener {
             //1step
@@ -61,10 +61,15 @@ class LoginActivity : AppCompatActivity() {
             .build()
         googleSignInClient = GoogleSignIn.getClient(this, gso)
         callbackManager = CallbackManager.Factory.create()
-
-
     }//onCreate
-    /*페이스북 로그인*/
+
+//    //자동 로그인 기능
+//    override fun onStart() {
+//        super.onStart()
+//        moveMainPage(auth?.currentUser)
+//    }//onStart
+
+    /*1. 페이스북 로그인*/
     //onCreate 에서 한번 호출해 로그로 찍힌 hashkey 를 얻는다
     fun printHashKey() {
         try {
@@ -80,7 +85,7 @@ class LoginActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("log", "Can not print HashKey", e)
         }
-    }//fun
+    }//printHashKey
 
     fun facebookLogin(){
         //페이스북에서 프로필과 이메일을 요청함
@@ -91,16 +96,16 @@ class LoginActivity : AppCompatActivity() {
             override fun onSuccess(result: LoginResult?) {
                 //2step
                 //로그인 성공 시 정보를 파이어베이스에 넘김
-                handleFacebookAcessToken(result?.accessToken)
+                handleFacebookAccessToken(result?.accessToken)
             }
             override fun onCancel() {
             }
             override fun onError(error: FacebookException?) {
             }
         })
-    }//fun
+    }//facebookLogin
 
-    fun handleFacebookAcessToken(token : AccessToken?){
+    fun handleFacebookAccessToken(token : AccessToken?){
         var credential = FacebookAuthProvider.getCredential(token?.token!!)
         auth?.signInWithCredential(credential)?.addOnCompleteListener { task ->
             if (task.isSuccessful) {
@@ -112,14 +117,14 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this, task.exception!!.message, Toast.LENGTH_SHORT).show()
             }
         }
-    }//fun
+    }//handleFacebookAccessToken
 
 
-    /*구글 로그인*/
+    /*2. 구글 로그인*/
     fun googleLogin() {
         var signInIntent = googleSignInClient?.signInIntent
         startActivityForResult(signInIntent, GOOGLE_LOGIN_CODE)
-    }//fun
+    }//googleLogin
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -134,7 +139,7 @@ class LoginActivity : AppCompatActivity() {
                 firebaseAuthWithGoogle(account)
             }
         }
-    }//fun
+    }//onActivityResult
 
     fun firebaseAuthWithGoogle(account: GoogleSignInAccount?) {
         var credential = GoogleAuthProvider.getCredential(account?.idToken, null)
@@ -147,9 +152,9 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this, task.exception!!.message, Toast.LENGTH_SHORT).show()
             }
         }
-    }//fun
+    }//firebaseAuthWithGoogle
 
-    /* 이메일 로그인 */
+    /*3. 이메일 로그인 */
     fun signinAndSignup() {
         auth?.createUserWithEmailAndPassword(
             email_edittext.text.toString(),
@@ -164,7 +169,7 @@ class LoginActivity : AppCompatActivity() {
                 signinEmail()
             }
         }
-    }//fun
+    }//signinAndSignup
 
     fun signinEmail() {
         auth?.signInWithEmailAndPassword(
@@ -179,11 +184,13 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this, task.exception!!.message, Toast.LENGTH_SHORT).show()
             }
         }
-    }//fun
+    }//signinEmail
 
     fun moveMainPage(user: FirebaseUser?) {
         if (user != null) {
             startActivity(Intent(this, MainActivity::class.java))
+            //MainActivity 로 이동하면서 LoginActivity 를 닫음
+            finish()
         }
-    }//fun
+    }//moveMainPage
 }//class
