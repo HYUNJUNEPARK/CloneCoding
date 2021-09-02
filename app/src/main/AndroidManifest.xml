@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.june.insta">
-
     <!-- 인터넷 연결 퍼미션 -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <!-- 스토리지 접근 권한 퍼미션 -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- 스토리지 접근 권한 퍼미션 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -14,12 +12,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".navigation.AddPhotoActivitiy"></activity>
-
-        <!-- 페이스북 로그인 웹뷰액티비티를 위해 추가된 메타 데이터 -->
+        <activity android:name=".navigation.CommentActivity"></activity>
+        <activity android:name=".navigation.AddPhotoActivitiy" /> <!-- 페이스북 로그인 웹뷰액티비티를 위해 추가된 메타 데이터 -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
+
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
@@ -35,9 +33,7 @@
 
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
-        </activity>
-
-        <!-- activity -->
+        </activity> <!-- activity -->
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -46,7 +42,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
-
     </application>
 
 </manifest>
