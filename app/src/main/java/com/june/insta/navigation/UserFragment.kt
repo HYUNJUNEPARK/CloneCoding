@@ -212,5 +212,5 @@ class UserFragment : Fragment() {
         override fun getItemCount(): Int {
             return contentDTOs.size
         }//getItemCount
-    }//Adapter
+    }//inner class
 }//class
