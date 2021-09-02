@@ -2,4 +2,22 @@
 안드로이드 이미지 로딩 라이브러리로 사진, 동영상, GIF 로딩 기능을 지원한다
 https://github.com/bumptech/glide 에 다운로드 코드 참고
 
+** 문제 발생과 해결 **
+문제) UserFragment 에서 Glide 로 프로필 사진을 가져와 XML 의 imageView 에 띄우는 부분에서 NullPointerException 발생
+-> onCreateView 부분에서 실행되는 코드 Glide.with(activity).load(url).apply(option).into(view) 의 activity 를 받아오지 못함
 
+해결)
+1차 시도 - activity!! 를 requireContext() 로 수정 -> 문법적 오류는 해결되나 계속 NullPointerException 발생
+2차 시도 - onCreateView 에서 Glide 를 사용하지 않고, onViewCreated 에서 매개변수로 넘오 온 view 로 imageView 를 연결했더니 문제 해결됨
+문제 발생의 이유를 추리해 보자면 Fragment 는 Activity 처럼 context 를 올리는 것에 제약이 있어 requireContext() 를 사용해야 함
+-> context 를 가져오는 문제 해결
+into(view) 단계에서 발생한 문제를 해결하려면 Fragment Lifecycle 을 이해해야하는데, onCreatedView 내부의 Glide 가 호출된 시점에서 view 생성이 불안한 것으로 추측
+-> 뷰가 완전히 생성되는 시점인 onViewCreated() 부분에서 Glide 를 실행했더니 해결됨
+
+** Fragment Lifecycle **
+onCreate()
+해당 콜백은 프래그먼트가 생성될 때 단 한번만 호출된다. 따라서, 이 콜백에서는 데이터와 같은 리소스 초기화 작업을 수행하는게 적합하다.
+onCreateView()
+해당 콜백은 뷰가 생성되어 매개변수로 사용가능한 시점이다.  또한, 프래그먼트가 백스택에서 되돌아오는 지점이기도 하다.
+onViewCreated()
+해당 콜백은 onCreateView()가 호출된 직후 호출된다. 뷰가 완전히 생성되어 있는 지점이다.
