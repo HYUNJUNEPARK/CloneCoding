@@ -1,0 +1,27 @@
+** 사전 준비 **
+1. build.gradle(app) 에 implementation 'com.google.firebase:firebase-messaging:18.0.0' 추가
+2. AndroidManifest 에 아래 메타 데이터 추가
+<meta-data
+	android:name="com.google.firebase.messaging.default_notification_icon"
+	android:resource="@drawable/push_icon"/>
+<meta-data
+	android:name="com.google.firebase.messaging.default_notification_color"
+	android:resource="@color/colorAccent"/>
+
+** 알람 보내기(모든 디바이스) **
+Firebase -> Engage -> Cloud Messaging 에서 보낼 메세지의 타이틀과 내용을 입력해서 전송
+# 앱이 백그라운드에 있어야 메세지가 오며, 시간차가 제법 있음
+
+** 알람 보내기(특정 디바이스) **
+1. 특정 기기를 구별할 수 있도록 로그인을 하면 기기마다 토큰을 받아오는 함수를 만들고 onCreate 에서 실행
+Firebase DB 안에 pushtokens 내부에 토큰 값이 저장됨
+fun registerPushToken(){
+    FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener {
+        task ->
+        val token = task.result?.token
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        val map = mutableMapOf<String, Any>()
+        map["pushToken"] = token!!
+        FirebaseFirestore.getInstance().collection("pushtokens").document(uid!!).set(map)
+    }
+}
