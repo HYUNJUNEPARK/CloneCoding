@@ -160,7 +160,6 @@ class UserFragment : Fragment() {
         }
 
         //Save data to third account
-
         var tsDocFollower = firestore?.collection("users")?.document(uid!!)
         firestore?.runTransaction { transaction ->
             var followDTO = transaction.get(tsDocFollower!!).toObject(FollowDTO::class.java)
