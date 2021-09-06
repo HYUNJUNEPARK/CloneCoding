@@ -18,6 +18,7 @@ import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import com.june.insta.navigation.*
+import com.june.insta.navigation.util.FcmPush
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -83,7 +84,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
             FirebaseFirestore.getInstance().collection("pushtokens").document(uid!!).set(map)
         }
-    }
+    }//registerPushToken
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,6 +98,11 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         //로그인을 실행하면 토큰을 저장함
         registerPushToken()
     }//onCreate
+
+//    override fun onStop() {
+//        super.onStop()
+//        FcmPush.instance.sendMessage("gyQsSR6D5RhHWpDJsyCTPx0XpJ02","hi", "bye")
+//    }
 
     //UserFragment 에서 프로필 사진을 선택한 응답을 처리
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

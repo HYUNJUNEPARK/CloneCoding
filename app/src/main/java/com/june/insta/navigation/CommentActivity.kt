@@ -14,6 +14,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.june.insta.R
 import com.june.insta.navigation.model.AlarmDTO
 import com.june.insta.navigation.model.ContentDTO
+import com.june.insta.navigation.util.FcmPush
 import kotlinx.android.synthetic.main.activity_comment.*
 import kotlinx.android.synthetic.main.item_comment.view.*
 
@@ -52,6 +53,9 @@ class CommentActivity : AppCompatActivity() {
         alarmDTO.timestamp = System.currentTimeMillis()
         alarmDTO.message = message
         FirebaseFirestore.getInstance().collection("alarms").document().set(alarmDTO)
+
+        var msg = FirebaseAuth.getInstance().currentUser?.email + " " + getString(R.string.alarm_comment) + " of " + message
+        FcmPush.instance.sendMessage(destinationUid, "test favoriteAlarm", msg)
     }//commentAlarm
 
     inner class CommentRecyclerviewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
