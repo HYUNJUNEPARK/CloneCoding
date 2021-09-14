@@ -3,33 +3,3 @@
 
 2. Soft Wrap 설정
 File -> Settings -> Editor -> General -> Soft Wraps these files 에 ; *.kt; *.xml 추가
-
-
-
-///////////
-okhttp
-gson
-multidex : 라이브러리를 8개 이상 사용가능하게 해줌
-
-implementation 'com.squareup.okhttp3:okhttp:3.4.1'
-implementation 'com.google.code.gson:gson:2.8.6'
-implementation 'androidx.multidex:multidex:2.0.1'
-
-android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.3"
-
-    defaultConfig {
-        ...
-        multiDexEnabled true
-        ...
-    }
-}
-
-Firebase -> Docs -> Reference -> REST -> Cloud Messaging ->
-Legacy HTTP Server Protocol -> https://fcm.googleapis.com/fcm/send 복사 후
-FcmPush 클래스 내부 url 변수에 넣어줌
-
-구글 클라우드 플랫폼 검색 -> 프로젝트 선택 -> API 및 서비스 -> 사용자 인증 정보
--> +사용자 인증 정보 만들기 -> API 키 복사 후 serverkey 변수에 넣어주기
-
