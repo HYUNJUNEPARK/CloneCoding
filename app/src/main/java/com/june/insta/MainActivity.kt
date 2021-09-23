@@ -3,10 +3,10 @@ package com.june.insta
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.core.app.ActivityCompat
@@ -18,45 +18,75 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
-import com.june.insta.databinding.ActivityLoginBinding
+import com.june.insta.databinding.ActivityMainBinding
 import com.june.insta.navigation.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
+    //[Variation For ViewBinding]
+    private lateinit var binding : ActivityMainBinding
 
+//[START onCreate]
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
+        binding.bottomNavigation.setOnNavigationItemSelectedListener(this)
+
+        //디테일 뷰 프레그먼트
+        binding.bottomNavigation.selectedItemId = R.id.action_home
+        //로그인을 실행하면 토큰을 저장함
+        registerPushToken()
+    }
+//[END onCreate]
+
+//[START 네비게이션]
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         setToolbarDefault()
         when(item.itemId){
+
+         //[START 사진 업로드]
             R.id.action_home -> {
-                var detailViewFragment = DetailViewFragment()
+                val detailViewFragment = DetailViewFragment()
                 supportFragmentManager.beginTransaction().replace(R.id.main_content, detailViewFragment).commit()
                 return true
-            }//home
+            }
+         //[END 사진 업로드]
 
             R.id.action_search -> {
-                var gridFragment = GridFragment()
+                val gridFragment = GridFragment()
                 supportFragmentManager.beginTransaction().replace(R.id.main_content, gridFragment).commit()
                 return true
             }//search
 
+         //[START 사진 업로드]
             R.id.action_add_photo -> {
-                //외부 스토리지를 갖고 올 수 있는 권한이 있다면
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
-                    startActivity(Intent(this, AddPhotoActivitiy::class.java))
+                //권한 승인을 하면 false 로 바뀌면서 바로 갤러리로 넘어갈 수 있도록 만든 변수
+                var checker: Boolean = true
+                //사진 업로드 버튼을 누르면 저장소 접근 권한을 물음
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 1)
+
+                while (checker){
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+                        Log.d("checkLog","사진 업로드 activity 오픈")
+                        checker = false
+                        startActivity(Intent(this, AddPhotoActivitiy::class.java))
+                    }
                 }
                 return true
-            }//photo
+            }
+         //[END 사진 업로드]
 
             R.id.action_favorite_alarm -> {
-                var alarmFragment = AlarmFragment()
+                val alarmFragment = AlarmFragment()
                 supportFragmentManager.beginTransaction().replace(R.id.main_content, alarmFragment).commit()
                 return true
             }//alarm
 
             R.id.action_account -> {
-                var userFragment = UserFragment()
+                val userFragment = UserFragment()
                 //유저 페이지 만들기
                 var bundle = Bundle()
                 var uid = FirebaseAuth.getInstance().currentUser?.uid
@@ -65,18 +95,19 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                 supportFragmentManager.beginTransaction().replace(R.id.main_content, userFragment).commit()
                 return true
             }//account
-        }//when
+        }
         return false
-    }//onNavigationItemSelected
+    }
+//[END 네비게이션]
 
     //인스타 타이틀 보이기, 백버튼&유저네임 숨김.
-    fun setToolbarDefault(){
+    private fun setToolbarDefault(){
         toolbar_username.visibility = View.GONE
         toolbar_btn_back.visibility = View.GONE
         toolbar_title_image.visibility = View.VISIBLE
     }//setToolbarDefault
 
-    fun registerPushToken(){
+    private fun registerPushToken(){
         FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener {
             task ->
             val token = task.result?.token
@@ -87,19 +118,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             FirebaseFirestore.getInstance().collection("pushtokens").document(uid!!).set(map)
         }
     }//registerPushToken
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        bottom_navigation.setOnNavigationItemSelectedListener(this)
-        //사진 권한을 요청
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 1)
-        //디테일 뷰 프레그먼트
-        bottom_navigation.selectedItemId = R.id.action_home
-        //로그인을 실행하면 토큰을 저장함
-        registerPushToken()
-    }//onCreate
 
 //    override fun onStop() {
 //        super.onStop()

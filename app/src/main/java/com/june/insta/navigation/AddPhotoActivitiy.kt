@@ -5,77 +5,82 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.UploadTask
-import com.june.insta.R
+import com.june.insta.databinding.ActivityAddPhotoActivitiyBinding
 import com.june.insta.navigation.model.ContentDTO
-import kotlinx.android.synthetic.main.activity_add_photo_activitiy.*
 import java.text.SimpleDateFormat
 import java.util.*
 
 class AddPhotoActivitiy : AppCompatActivity() {
-    var PICK_IMAGE_FROM_ALBUM = 0
-    var storage: FirebaseStorage? = null
-    var photoUri: Uri? = null
-    var auth : FirebaseAuth? = null
-    var firestore : FirebaseFirestore? = null
+    //[Variation for ViewBinding]
+    private lateinit var binding : ActivityAddPhotoActivitiyBinding
 
+    //[Variation for using Firebase database]
+    var auth : FirebaseAuth? = null
+    private var firestore : FirebaseFirestore? = null
+
+    //[Variation for image upload to Firebase database]
+    private var storage: FirebaseStorage? = null
+    private var photoUri: Uri? = null
+    private var pickImageFromAlbum = 0
+
+//[START onCreate]
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_photo_activitiy)
+        binding = ActivityAddPhotoActivitiyBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        //fun contentUpload 에서 사용
+        //[START 이미지를 가져오기 위한 Implicit intent]
+        val photoPickerIntent = Intent(Intent.ACTION_PICK)
+        photoPickerIntent.type = "image/*"
+        startActivityForResult(photoPickerIntent, pickImageFromAlbum)
+        //[END 이미지를 가져오기 위한 Implicit intent]
+
+        //[START 파이어베이스 DB를 사용하기 위한 인스턴스 초기화]
         storage = FirebaseStorage.getInstance()
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
+         //[END 파이어베이스 DB를 사용하기 위한 인스턴스 초기화]
 
-        //1. 액티비티 실행 시 암묵적 Intent 를 request code 와 함께 보내줌 -> onActivityResult
-        //type 은 안드로이드 스토리지 내 파일 형식을 입력 * 동영상일 경우 "video/*"
-        var photoPickerIntent = Intent(Intent.ACTION_PICK)
-        photoPickerIntent.type = "image/*"
-        startActivityForResult(photoPickerIntent, PICK_IMAGE_FROM_ALBUM)
-
-        addphoto_btn_upload.setOnClickListener {
+        binding.addphotoBtnUpload.setOnClickListener {
             contentUpload()
         }
-    }//onCreate
+    }
+//[END onCreate]
 
-    //2. 암묵적 Intent 에서 이미지를 처리할 수 있는 Activity 를 열어주고, 사용자가 이미지를 선택했다면 requestCode, resultCode, data 를 응답으로 받음
+//[START onActivityResult : Implicit intent 에서 이미지 처리하는 Activity 오픈 -> 사용자 이미지 선택 -> requestCode, resultCode, data 를 응답으로 받음]
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PICK_IMAGE_FROM_ALBUM) {
+        if (requestCode == pickImageFromAlbum) {
             if (resultCode == Activity.RESULT_OK) {
                 photoUri = data?.data
-                //레이아웃에 사용자가 선택한 이미지를 세팅
-                addphoto_image.setImageURI(photoUri)
+                binding.addphotoImage.setImageURI(photoUri)
+                Toast.makeText(this, "이미지를 성공적으로 불러왔습니다.", Toast.LENGTH_LONG).show()
             } else {
-                Log.d("log", "Photo Upload Canceled")
+                Toast.makeText(this, "이미지를 불러오지 못했습니다.", Toast.LENGTH_LONG).show()
                 finish()
             }
         }
-    }//fun
+    }
+//[END onActivityResult]
 
-    //3. 업로드 버튼을 누르면 Storage 에 이미지 업로드하고 Firestore Database 에 나머지 데이터 업로드
-    fun contentUpload() {
-        var timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        var imageFileName = "IMAGE_" + timestamp + "_.jpeg"
-        //Storage 에 이미지를 저장
-        var storageRef = storage?.reference?.child("images")?.child(imageFileName)
+//[START contentUpload : 파이어베이스 DB 에 데이터 업로드]
+    private fun contentUpload() {
+        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val imageFileName = "IMAGE_" + timestamp + "_.jpeg"
+        val storageRef = storage?.reference?.child("images")?.child(imageFileName)
 
-        //Collback method
         storageRef?.putFile(photoUri!!)?.addOnSuccessListener {
             storageRef.downloadUrl.addOnSuccessListener { uri ->
-                var contentDTO = ContentDTO()
+                val contentDTO = ContentDTO()
 
                 contentDTO.imageUrl = uri.toString()
                 contentDTO.uid = auth?.currentUser?.uid
                 contentDTO.userId = auth?.currentUser?.email
-                contentDTO.explain = addphoto_edit_explain.text.toString()
+                contentDTO.explain = binding.addphotoEditExplain.text.toString()
                 contentDTO.timestamp = System.currentTimeMillis()
 
                 firestore?.collection("images")?.document()?.set(contentDTO)
@@ -83,5 +88,6 @@ class AddPhotoActivitiy : AppCompatActivity() {
                 finish()
             }
         }
-    }//fun
-}//class
+    }
+//[END contentUpload]
+}

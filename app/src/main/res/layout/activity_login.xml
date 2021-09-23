@@ -19,7 +19,6 @@
         android:id="@+id/signin_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
         android:layout_above="@+id/login_layout"
         android:orientation="vertical">
 
@@ -49,16 +48,18 @@
         </com.google.android.material.textfield.TextInputLayout>
 
 
-<!--이메일 로그인-->
+<!--이메일 회원가입-->
         <Button
-            android:id="@+id/email_login_button"
-            android:layout_width="match_parent"
+            android:id="@+id/email_signUp_button"
+            android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="15dp"
             android:layout_marginRight="20dp"
-            android:layout_marginBottom="30dp"
-            android:text="@string/signIn_email"/>
+            android:layout_marginBottom="20dp"
+            android:layout_gravity="right"
+            android:text="@string/signUp_email"/>
+
     </LinearLayout>
 
     <LinearLayout
@@ -69,14 +70,14 @@
         android:layout_height="wrap_content">
 
         <Button
-            android:id="@+id/email_signUp_button"
+            android:id="@+id/email_login_button"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="15dp"
             android:layout_marginRight="20dp"
-            android:layout_marginBottom="20dp"
-            android:text="@string/signUp_email"/>
+            android:layout_marginBottom="30dp"
+            android:text="@string/signIn_email"/>
 
         <Button
             android:id="@+id/facebook_login_button"
@@ -97,7 +98,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginTop="15dp"
             android:layout_marginRight="20dp"
-            android:layout_marginBottom="30dp"
+            android:layout_marginBottom="40dp"
             android:background="@drawable/btn_signin_google"
             android:text="@string/signin_google"
             android:textColor="@color/colorWhite" />

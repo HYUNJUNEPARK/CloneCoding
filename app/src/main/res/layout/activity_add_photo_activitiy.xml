@@ -10,6 +10,7 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/my_toolbar"
         android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
         android:layout_height="35dp">
         <ImageView
             android:layout_width="match_parent"
@@ -25,33 +26,41 @@
         android:layout_below="@+id/my_toolbar"
         android:layout_height="1dp"/>
 
-    <ImageView
-        android:id="@+id/addphoto_image"
-        android:layout_below="@+id/toolbar_division"
-        android:layout_margin="8dp"
-        android:layout_width="100dp"
-        android:layout_height="100dp"/>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/editText"
-        android:layout_below="@+id/toolbar_division"
-        android:layout_toRightOf="@id/addphoto_image"
+    <LinearLayout
+        android:id="@+id/middle_contents"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <EditText
-            android:id="@+id/addphoto_edit_explain"
-            android:gravity="center"
-            android:hint="@string/hint_image_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar_division"
+        android:layout_marginTop="-1dp"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/addphoto_image"
             android:layout_width="match_parent"
-            android:layout_height="100dp"/>
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_height="200dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:scaleType="centerCrop" />
 
-    <Button
-        android:id="@+id/addphoto_btn_upload"
-        android:text="@string/upload_image"
-        android:layout_toRightOf="@id/addphoto_image"
-        android:layout_below="@+id/editText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <EditText
+                android:id="@+id/addphoto_edit_explain"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:hint="문구 입력..." />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/addphoto_btn_upload"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="사진 업로드" />
+    </LinearLayout>
 
 </RelativeLayout>

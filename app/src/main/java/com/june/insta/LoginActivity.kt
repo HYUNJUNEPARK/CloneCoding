@@ -33,6 +33,7 @@ class LoginActivity : AppCompatActivity() {
     private var googleLoginCode = 9001
     private var callbackManager: CallbackManager? = null
 
+//[START OnCreate]
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
@@ -89,6 +90,7 @@ class LoginActivity : AppCompatActivity() {
             facebookLogin()
         }
     }
+//[END OnCreate]
 
 //    //[START 자동 로그인 기능]
 //    override fun onStart() {
@@ -97,9 +99,7 @@ class LoginActivity : AppCompatActivity() {
 //    }
 //    //[END 자동 로그인 기능]
 
-
-
-
+//[START 페이스북 로그인]
     //[START 페이스북 로그인]
     private fun facebookLogin(){
         LoginManager.getInstance().logInWithReadPermissions(this, listOf("public_profile", "email"))
@@ -114,6 +114,9 @@ class LoginActivity : AppCompatActivity() {
             }
         })
     }
+    //[END 페이스북 로그인]
+
+    //[START 페이스북 로그인 토큰 엑세스]
     fun handleFacebookAccessToken(token : AccessToken?){
         val credential = FacebookAuthProvider.getCredential(token?.token!!)
         auth?.signInWithCredential(credential)?.addOnCompleteListener { task ->
@@ -125,6 +128,9 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
+    //[END 페이스북 로그인 토큰 엑세스]
+
+    //[START 페이스북 로그인 해쉬키]
 //    fun printHashKey() {
 //        try {
 //            val info = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
@@ -140,13 +146,15 @@ class LoginActivity : AppCompatActivity() {
 //            Log.e("checkLog", "Can not print HashKey", e)
 //        }
 //    }
-    //[END 페이스북 로그인]
+    //[END 페이스북 로그인 해쉬키]
+//[END 페이스북 로그인]
 
-    //[START 구글 로그인]
+//[START 구글 로그인]
     private fun googleLogin() {
         val signInIntent = googleSignInClient?.signInIntent
         startActivityForResult(signInIntent, googleLoginCode)
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         callbackManager?.onActivityResult(requestCode, resultCode, data)
@@ -162,6 +170,8 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
+
+    //[START 피이어베이스 권한]
     private fun firebaseAuthWithGoogle(account: GoogleSignInAccount?) {
         val credential = GoogleAuthProvider.getCredential(account?.idToken, null)
         auth?.signInWithCredential(credential)?.addOnCompleteListener { task ->
@@ -173,8 +183,10 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
-    //[START 구글 로그인]
+    //[END 피이어베이스 권한]
+//[END 구글 로그인]
 
+//[START 이메일 로그인/이메일 회원가입]
     //[START 이메일 로그인]
     private fun signIn(id:String, pw:String) {
         auth?.signInWithEmailAndPassword(id, pw)?.addOnCompleteListener { task ->
@@ -185,6 +197,9 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
+    //[END 이메일 로그인]
+
+    //[START 이메일 회원가입]
     private fun signUp(id:String, pw:String) {
         auth?.createUserWithEmailAndPassword(id, pw)?.addOnCompleteListener { task ->
             when {
@@ -201,5 +216,6 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
-    //[END 이메일 로그인]
+    //[END 이메일 회원가입]
+//[END 이메일 로그인/이메일 회원가입]
 }

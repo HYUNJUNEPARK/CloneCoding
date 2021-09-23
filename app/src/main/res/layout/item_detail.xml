@@ -18,7 +18,7 @@
             android:layout_height="35dp"/>
         <TextView
             android:id="@+id/detailviewitem_profile_textview"
-            android:text="User name"
+            android:text="USER NAME"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     </LinearLayout>
@@ -49,10 +49,12 @@
             android:layout_height="35dp"/>
     </LinearLayout>
 
-    <!--좋아요 수/설명-->
+    <!--좋아요 카운팅/이미지 설명-->
     <TextView
         android:id="@+id/detailviewitem_favoritecounter_textview"
-        android:text="like 0"
+        android:text="Like 0"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
     <TextView
@@ -62,5 +64,4 @@
         android:text="Explain content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
-        
 </LinearLayout>

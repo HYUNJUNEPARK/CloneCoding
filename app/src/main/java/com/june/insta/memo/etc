@@ -4,32 +4,19 @@
 2. Soft Wrap 설정
 File -> Settings -> Editor -> General -> Soft Wraps these files 에 ; *.kt; *.xml 추가
 
+** 개선 및 수정 사항 **
+1 UI 구성 중 '이메일 로그인' 과 '이메일 회원가입' 을 분할해 재구성(activity_login.xml)
+2 EditText 의 text 값에 아무것도 입력하지 않고 '이메일 로그인' 이나 '이메일 회원가입' 을 눌렀을 때 앱이 종료되던 문제를 해결(LoginActivity.kt)
+3 EditText 에 이메일 형식이 아닌 ID 를 넣으면 앱이 종료되던 문제를 해결(LoginActivity.kt)
+4 변수와 함수에 private 를 선언해 보안성을 높힘(LoginActivity.kt)
+6 'kotlin-android-extensions' 뷰바인딩으로 교체
+8 앱을 실행하면 바로 외부 저장소 권한을 묻는 기능 -> 사진 업로드 할 때 묻도록 수정(MainActivity.kt)
+9 앱 아이콘 등록
+10 게시글 작성날짜 기준으로 오름차순 정렬 -> 내림차순 정렬 되도록 수정. 최신 게시글을 제일 먼저 볼 수 있음(DetailViewFragment.kt)
+//firestore?.collection("images")?.orderBy("timestamp", Query.Direction.DESCENDING)?.addSnapshotListener{...}
 
 
-///////////
-okhttp
-gson
-multidex : 라이브러리를 8개 이상 사용가능하게 해줌
-
-implementation 'com.squareup.okhttp3:okhttp:3.4.1'
-implementation 'com.google.code.gson:gson:2.8.6'
-implementation 'androidx.multidex:multidex:2.0.1'
-
-android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.3"
-
-    defaultConfig {
-        ...
-        multiDexEnabled true
-        ...
-    }
-}
-
-Firebase -> Docs -> Reference -> REST -> Cloud Messaging ->
-Legacy HTTP Server Protocol -> https://fcm.googleapis.com/fcm/send 복사 후
-FcmPush 클래스 내부 url 변수에 넣어줌
-
-구글 클라우드 플랫폼 검색 -> 프로젝트 선택 -> API 및 서비스 -> 사용자 인증 정보
--> +사용자 인증 정보 만들기 -> API 키 복사 후 serverkey 변수에 넣어주기
-
+** 참고 링크  **
+파이어베이스 공식 문서 : https://firebase.google.com/docs/auth/android/google-signin?hl=ko
+뷰바인딩 참고 페이지(Activity/Fragment) : https://duckssi.tistory.com/42
+리사이클러뷰 바인딩 참고 페이지 : https://ichi.pro/ko/recyclerview-eodaebteoeseo-byu-bainding-eul-sayonghaneun-bangbeob-272785073792906
