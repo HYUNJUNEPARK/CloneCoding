@@ -46,22 +46,23 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         setToolbarDefault()
         when(item.itemId){
-
-         //[START 사진 업로드]
+            //[1. START 홈 화면]
             R.id.action_home -> {
                 val detailViewFragment = DetailViewFragment()
                 supportFragmentManager.beginTransaction().replace(R.id.main_content, detailViewFragment).commit()
                 return true
             }
-         //[END 사진 업로드]
+            //[1. END 홈 화면]
 
+            //[2. START DB 전체 이미지 보기]
             R.id.action_search -> {
                 val gridFragment = GridFragment()
                 supportFragmentManager.beginTransaction().replace(R.id.main_content, gridFragment).commit()
                 return true
-            }//search
+            }
+            //[2. START DB 전체 이미지 보기]
 
-         //[START 사진 업로드]
+            //[3. START 사진 업로드]
             R.id.action_add_photo -> {
                 //권한 승인을 하면 false 로 바뀌면서 바로 갤러리로 넘어갈 수 있도록 만든 변수
                 var checker: Boolean = true
@@ -77,14 +78,17 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                 }
                 return true
             }
-         //[END 사진 업로드]
+            //[3. END 사진 업로드]
 
+            //[4. START 알람 확인 페이지]
             R.id.action_favorite_alarm -> {
                 val alarmFragment = AlarmFragment()
                 supportFragmentManager.beginTransaction().replace(R.id.main_content, alarmFragment).commit()
                 return true
-            }//alarm
+            }
+            //[4. END 알람 확인 페이지]
 
+            //[5. START 유저 페이지]
             R.id.action_account -> {
                 val userFragment = UserFragment()
                 //유저 페이지 만들기
@@ -94,7 +98,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                 userFragment.arguments = bundle
                 supportFragmentManager.beginTransaction().replace(R.id.main_content, userFragment).commit()
                 return true
-            }//account
+            }
+            //[5. END 유저 페이지]
         }
         return false
     }

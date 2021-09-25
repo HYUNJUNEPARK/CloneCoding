@@ -99,7 +99,7 @@ class LoginActivity : AppCompatActivity() {
 //    }
 //    //[END 자동 로그인 기능]
 
-//[START 페이스북 로그인]
+//[1. START 페이스북 로그인]
     //[START 페이스북 로그인]
     private fun facebookLogin(){
         LoginManager.getInstance().logInWithReadPermissions(this, listOf("public_profile", "email"))
@@ -147,9 +147,9 @@ class LoginActivity : AppCompatActivity() {
 //        }
 //    }
     //[END 페이스북 로그인 해쉬키]
-//[END 페이스북 로그인]
+//[1. END 페이스북 로그인]
 
-//[START 구글 로그인]
+//[2. START 구글 로그인]
     private fun googleLogin() {
         val signInIntent = googleSignInClient?.signInIntent
         startActivityForResult(signInIntent, googleLoginCode)
@@ -184,9 +184,9 @@ class LoginActivity : AppCompatActivity() {
         }
     }
     //[END 피이어베이스 권한]
-//[END 구글 로그인]
+//[2. END 구글 로그인]
 
-//[START 이메일 로그인/이메일 회원가입]
+//[3. START 이메일 로그인/이메일 회원가입]
     //[START 이메일 로그인]
     private fun signIn(id:String, pw:String) {
         auth?.signInWithEmailAndPassword(id, pw)?.addOnCompleteListener { task ->
@@ -217,5 +217,5 @@ class LoginActivity : AppCompatActivity() {
         }
     }
     //[END 이메일 회원가입]
-//[END 이메일 로그인/이메일 회원가입]
+//[3. END 이메일 로그인/이메일 회원가입]
 }

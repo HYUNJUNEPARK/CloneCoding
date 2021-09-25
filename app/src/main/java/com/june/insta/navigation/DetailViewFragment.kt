@@ -59,7 +59,7 @@ class DetailViewFragment : Fragment() {
         }
 
     //[2-1.START 리사이클러뷰 오버라이딩]
-        //[2-1-1.START 바인딩뷰홀더 : 어댑터를 통해 만들어진 아이템 뷰를 저장. 어댑터에서 생성, 관리되고 재활용되어 자원을 효율적으로 사용함]
+        //[2-1-1.START 바인딩뷰홀더 : 아이템뷰에 들어갈 정보 배치]
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             var viewholder = (holder as CustomViewHolder).itemView
             viewholder.detailviewitem_profile_textview.text = contentDTOs!![position].userId
@@ -112,7 +112,7 @@ class DetailViewFragment : Fragment() {
     //[2-1.END 리사이클러뷰 오버라이딩]
 
     //[2-2.START 바인딩뷰홀더에서 사용되는 함수 : 좋아요 이벤트]
-        fun favoriteEvent(position : Int){
+        private fun favoriteEvent(position : Int){
             var tsDoc = firestore?.collection("images")?.document(contentUidList[position])
             firestore?.runTransaction { transaction ->
                 var contentDTO = transaction.get(tsDoc!!).toObject(ContentDTO::class.java)
@@ -131,7 +131,7 @@ class DetailViewFragment : Fragment() {
                 transaction.set(tsDoc, contentDTO)
             }
         }
-        fun favoriteAlarm(destinationUid : String){
+        private fun favoriteAlarm(destinationUid : String){
             var alarmDTO = AlarmDTO()
             alarmDTO.destinationUid = destinationUid
             alarmDTO.userId = FirebaseAuth.getInstance().currentUser?.email
