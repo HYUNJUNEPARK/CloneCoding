@@ -14,6 +14,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.june.insta.R
+import com.june.insta.databinding.FragmentDetailBinding
+import com.june.insta.databinding.ItemDetailBinding
 import com.june.insta.navigation.model.AlarmDTO
 import com.june.insta.navigation.model.ContentDTO
 import com.june.insta.navigation.util.FcmPush
@@ -21,65 +23,77 @@ import kotlinx.android.synthetic.main.fragment_detail.view.*
 import kotlinx.android.synthetic.main.item_detail.view.*
 
 class DetailViewFragment : Fragment() {
+    //[Variation for Fragment ViewBinding]
+    private var _binding : FragmentDetailBinding? = null
+    private val binding get() = _binding!!
+
+    //[Variation for using firebase]
     var firestore: FirebaseFirestore? = null
+
     var uid : String? = null
 
-//[1.START onCreateView]
+//[START onCreateView]
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var view = LayoutInflater.from(activity).inflate(R.layout.fragment_detail, container, false)
         firestore = FirebaseFirestore.getInstance()
         uid = FirebaseAuth.getInstance().currentUser?.uid
-        view.detailviewfragment_recyclerview.adapter = DetailViewRecyclerViewAdapter()
-        view.detailviewfragment_recyclerview.layoutManager = LinearLayoutManager(activity)
 
-        return view
+        _binding = FragmentDetailBinding.inflate(inflater, container, false)
+        binding.detailviewfragmentRecyclerview.adapter = DetailViewRecyclerViewAdapter()
+        binding.detailviewfragmentRecyclerview.layoutManager = LinearLayoutManager(activity)
+
+        return binding.root
     }
-//[1.END onCreateView]
+//[END onCreateView]
 
-//[2.START 라사이클러뷰 어댑터/홀더]
+//[START onDestroyView]
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+//[END onDestroyView]
+
+//[START 라사이클러뷰 어댑터/홀더]
     inner class DetailViewRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-        var contentDTOs: ArrayList<ContentDTO> = arrayListOf()
-        var contentUidList: ArrayList<String> = arrayListOf()
+        private var contentDTOs: ArrayList<ContentDTO> = arrayListOf()
+        private var contentUidList: ArrayList<String> = arrayListOf()
 
         init {
             firestore?.collection("images")?.orderBy("timestamp", Query.Direction.DESCENDING)?.addSnapshotListener { querySnapshot, firebaseFirestoreException ->
                     contentDTOs.clear()
                     contentUidList.clear()
-
                     if (querySnapshot == null) return@addSnapshotListener
-
                     for (snapshot in querySnapshot!!.documents) {
                         var item = snapshot.toObject(ContentDTO::class.java)
                         contentDTOs.add(item!!)
                         contentUidList.add(snapshot.id)
                     }
-                    //리사이클러뷰 새로고침
                     notifyDataSetChanged()
                 }
         }
 
-    //[2-1.START 리사이클러뷰 오버라이딩]
-        //[2-1-1.START 바인딩뷰홀더 : 아이템뷰에 들어갈 정보 배치]
+    //[START 리사이클러뷰 오버라이딩]
+        //[1. START 바인딩뷰홀더 : 아이템뷰에 들어갈 정보 배치]
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            var viewholder = (holder as CustomViewHolder).itemView
-            viewholder.detailviewitem_profile_textview.text = contentDTOs!![position].userId
-            viewholder.detailviewitem_explain_textview.text = contentDTOs!![position].explain
-            viewholder.detailviewitem_favoritecounter_textview.text = "좋아요 " + contentDTOs!![position].favoriteCount+"개"
-            Glide.with(holder.itemView.context).load(contentDTOs!![position].imageUrl).into(viewholder.detailviewitem_imageview_content)
+            var viewHolder = (holder as CustomViewHolder).binding
 
-            viewholder.detailviewitem_favorite_imageview.setOnClickListener {
+            viewHolder.detailviewitemProfileTextview.text = contentDTOs!![position].userId
+            viewHolder.detailviewitemExplainTextview.text = contentDTOs!![position].explain
+            viewHolder.detailviewitemFavoritecounterTextview.text = "좋아요 " + contentDTOs!![position].favoriteCount+"개"
+            Glide.with(holder.itemView.context).load(contentDTOs!![position].imageUrl).into(viewHolder.detailviewitemImageviewContent)
+
+            viewHolder.detailviewitemFavoriteImageview.setOnClickListener {
                 favoriteEvent(position)
             }
 
-            //좋아요가 눌렸을 때 하트색을 바꿔줌
-            if(contentDTOs!![position].favorites.containsKey(uid)){
-                viewholder.detailviewitem_favorite_imageview.setImageResource(R.drawable.ic_favorite)
+            //1-1. '좋아요' 클릭 -> 하트색 변경 (검 <-> 흰)
+            if(contentDTOs!![position].favorites.containsKey(uid)){ view
+                viewHolder.detailviewitemFavoriteImageview.setImageResource(R.drawable.ic_favorite)
             }else{
-                viewholder.detailviewitem_favorite_imageview.setImageResource(R.drawable.ic_favorite_border)
+                viewHolder.detailviewitemFavoriteImageview.setImageResource(R.drawable.ic_favorite_border)
             }
 
-            //프로필 이미지가 클릭됐을 때
-            viewholder.detailviewitem_profile_image.setOnClickListener {
+            //1-2. 프로필 이미지가 클릭 -> UserFragment 로 이동
+            viewHolder.detailviewitemProfileImage.setOnClickListener {
                 var fragment = UserFragment()
                 var bundle = Bundle()
                 bundle.putString("destinationUid", contentDTOs[position].uid)
@@ -88,36 +102,39 @@ class DetailViewFragment : Fragment() {
                 activity?.supportFragmentManager?.beginTransaction()?.replace(R.id.main_content, fragment)?.commit()
             }
 
-            //코멘트 이미지가 클릭됐을 때
-            viewholder.detailviewitem_comment_imageview.setOnClickListener { v ->
+            //1-3. 코멘트 이미지가 클릭 -> CommentActivity 로 이동
+            viewHolder.detailviewitemCommentImageview.setOnClickListener { v ->
                 var intent = Intent(v.context, CommentActivity::class.java)
                 intent.putExtra("contentUid", contentUidList[position])
                 intent.putExtra("destinationUid", contentDTOs[position].uid)
                 startActivity(intent)
             }
         }
-        //[2-1-1.END 바인딩뷰홀더]
+        //[1. END 바인딩뷰홀더 : 아이템뷰에 들어갈 정보 배치]
 
+        //[2. START getItemCount]
         override fun getItemCount(): Int {
             return contentDTOs.size
         }
+        //[2. END getItemCount]
 
-        //inner class CustomViewHolder,  override fun onCreateViewHolder 를 만든 것은 메모리를 적게 사용하기 위한 약속
+        //[3. START inner class CustomViewHolder,  override fun onCreateViewHolder 를 만든 것은 메모리를 적게 사용하기 위한 약속]
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            var view = LayoutInflater.from(parent.context).inflate(R.layout.item_detail, parent, false)
-            return CustomViewHolder(view)
+            var binding = ItemDetailBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            return CustomViewHolder(binding)
         }
 
-        inner class CustomViewHolder(view: View) : RecyclerView.ViewHolder(view)
-    //[2-1.END 리사이클러뷰 오버라이딩]
+        inner class CustomViewHolder(val binding: ItemDetailBinding) : RecyclerView.ViewHolder(binding.root)
+        //[3. END inner class CustomViewHolder,  override fun onCreateViewHolder]
+    //[END 리사이클러뷰 오버라이딩]
 
-    //[2-2.START 바인딩뷰홀더에서 사용되는 함수 : 좋아요 이벤트]
+    //[START 바인딩뷰홀더에서 사용되는 함수 : 좋아요 이벤트]
+        //[1. START 좋아요 카운팅 세팅]
         private fun favoriteEvent(position : Int){
             var tsDoc = firestore?.collection("images")?.document(contentUidList[position])
             firestore?.runTransaction { transaction ->
                 var contentDTO = transaction.get(tsDoc!!).toObject(ContentDTO::class.java)
 
-                //containkey 가 되어있다는 것은 좋아요 버튼이 눌려있다는 것으로 버튼을 한번 더 누르면 좋아요가 취소됨
                 if (contentDTO!!.favorites.containsKey(uid)){
                     contentDTO.favoriteCount = contentDTO.favoriteCount -1
                     contentDTO.favorites.remove(uid)
@@ -127,10 +144,12 @@ class DetailViewFragment : Fragment() {
 
                     favoriteAlarm(contentDTOs[position].uid!!)
                 }
-                //트랜잭션을 다시 서버로 돌려줌
                 transaction.set(tsDoc, contentDTO)
             }
         }
+        //[1. END 좋아요 카운팅 세팅]
+
+        //[2. START 좋아요 알람]
         private fun favoriteAlarm(destinationUid : String){
             var alarmDTO = AlarmDTO()
             alarmDTO.destinationUid = destinationUid
@@ -142,7 +161,8 @@ class DetailViewFragment : Fragment() {
             var message = FirebaseAuth.getInstance()?.currentUser?.email + getString(R.string.alarm_favorite)
             FcmPush.instance.sendMessage(destinationUid, "test favoriteAlarm", message)
         }
-    //[2-2.END 바인딩뷰홀더에서 사용되는 함수]
+        //[2. END 좋아요 알람]
     }
-//[2.END 라사이클러뷰 어댑터/홀더]
+    //[END 바인딩뷰홀더에서 사용되는 함수 : 좋아요 이벤트]
 }
+//END 라사이클러뷰 어댑터/홀더]

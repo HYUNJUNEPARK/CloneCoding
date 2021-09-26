@@ -28,6 +28,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_user.view.*
 
 class UserFragment : Fragment() {
+
+
     var fragmentView : View? = null
     var firestore : FirebaseFirestore? = null
     var uid : String? = null
@@ -37,7 +39,7 @@ class UserFragment : Fragment() {
     companion object {
         var PICK_PROFILE_FROM_ALBUM = 10
     }
-
+//[START onCreateView]
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var fragmentView = LayoutInflater.from(activity).inflate(R.layout.fragment_user, container, false)
         //이전 화면에서 넘어온 uid 을 받아옴
@@ -81,14 +83,18 @@ class UserFragment : Fragment() {
             activity?.startActivityForResult(photoPickerIntent, PICK_PROFILE_FROM_ALBUM)
         }
         return fragmentView
-    }//onCreateView
+    }
+//[START onCreateView]
 
+//[START onViewCreated]
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         getProfileImage(view)
         getFollowerAndFollowing(view)
-    }//onViewCreated
+    }
+//[END onViewCreated]
 
+//[START 사용 함수]
     fun followerAlarm(destinationUid : String){
         var alarmDTO = AlarmDTO()
         alarmDTO.destinationUid = destinationUid
@@ -188,7 +194,8 @@ class UserFragment : Fragment() {
             transaction.set(tsDocFollower,followDTO!!)
             return@runTransaction
         }
-    }//requestFollow
+    }
+//[END 사용 함수]
 
     inner class UserFragmentRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
         var contentDTOs : ArrayList<ContentDTO> = arrayListOf()
@@ -226,6 +233,6 @@ class UserFragment : Fragment() {
 
         override fun getItemCount(): Int {
             return contentDTOs.size
-        }//getItemCount
-    }//inner class
-}//class
+        }
+    }
+}
