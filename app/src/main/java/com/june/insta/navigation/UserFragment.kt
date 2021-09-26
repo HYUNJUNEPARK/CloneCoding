@@ -33,7 +33,6 @@ class UserFragment : Fragment() {
     private var _binding : FragmentUserBinding? = null
     private val binding get() = _binding!!
 
-    var fragmentView : View? = null
     var firestore : FirebaseFirestore? = null
     var uid : String? = null
     var auth : FirebaseAuth? = null
@@ -125,7 +124,6 @@ class UserFragment : Fragment() {
     }
 //[END onDestroyView]
 
-
 //[START 라사이클러뷰 어댑터/홀더]
     inner class UserFragmentRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
         private var contentDTOs : ArrayList<ContentDTO> = arrayListOf()
@@ -194,8 +192,6 @@ class UserFragment : Fragment() {
             if(documentSnapshot.data != null){
                 val url = documentSnapshot?.data!!["image"]
                 Glide.with(requireContext()).load(url).apply(RequestOptions().circleCrop()).into(binding.accountIvProfile)
-            } else {
-                Log.d("checkLog", "Firebase Exception : $firebaseFirestoreException")
             }
         }
     }

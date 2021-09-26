@@ -12,57 +12,79 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.firestore.FirebaseFirestore
-import com.june.insta.R
+import com.june.insta.databinding.FragmentGridBinding
 import com.june.insta.navigation.model.ContentDTO
 import kotlinx.android.synthetic.main.fragment_grid.view.*
 
 class GridFragment : Fragment() {
+    //[Variation for Fragment ViewBinding]
+    private var _binding : FragmentGridBinding? = null
+    private val binding get() = _binding!!
+
     var firestore : FirebaseFirestore? = null
-    var fragmentView : View? = null
+    private var fragmentView : View? = null
 
+//[START onCreateViw]
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        fragmentView = LayoutInflater.from(activity).inflate(R.layout.fragment_grid, container, false)
         firestore = FirebaseFirestore.getInstance()
-        fragmentView?.gridfragment_recyclerview?.adapter = UserFragmentRecyclerViewAdapter()
-        fragmentView?.gridfragment_recyclerview?.layoutManager = GridLayoutManager(activity, 3)
-        return fragmentView
-    }//onCreateView
 
+        _binding = FragmentGridBinding.inflate(inflater, container, false)
+        binding.gridfragmentRecyclerview?.adapter = UserFragmentRecyclerViewAdapter()
+        binding.gridfragmentRecyclerview?.layoutManager = GridLayoutManager(activity, 3)
+
+        return binding.root
+    }
+//[END onCreateViw]
+
+//[START onDestroyView]
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+//[END onDestroyView]
+
+
+//[START 라사이클러뷰 어댑터/홀더]
     inner class UserFragmentRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
-        var contentDTOs : ArrayList<ContentDTO> = arrayListOf()
+        private var contentDTOs : ArrayList<ContentDTO> = arrayListOf()
 
         init {
-            //DB 에서 내가 올린 이미지 데이터만 읽어 옴
             firestore?.collection("images")?.addSnapshotListener { querySnapshot, firebaseFirestoreException ->
                 if(querySnapshot == null) return@addSnapshotListener
 
                 for(snapshot in querySnapshot.documents){
                     contentDTOs.add(snapshot.toObject(ContentDTO::class.java)!!)
                 }
-                //리사이클러뷰 새로고침
                 notifyDataSetChanged()
             }
-        }//init
+        }
 
+        //[START onBindViewHolder]
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+            var imageView = (holder as CustomViewHolder).imageView
+            Glide.with(holder.itemView.context).load(contentDTOs[position].imageUrl).apply(
+                RequestOptions().centerCrop()).into(imageView)
+        }
+        //[END onBindViewHolder]
+
+        //[START getItemCount]
+        override fun getItemCount(): Int {
+            return contentDTOs.size
+        }
+        //[END getItemCount]
+
+        //[START START inner class CustomViewHolder,  override fun onCreateViewHolder]
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             //화면 넓이의 1/3 값을 가져와 이미지를 넣어줄 준비
             var width = resources.displayMetrics.widthPixels / 3
-            var imageview = ImageView(parent.context)
-            imageview.layoutParams = LinearLayoutCompat.LayoutParams(width, width)
+            var imageView = ImageView(parent.context)
+            imageView.layoutParams = LinearLayoutCompat.LayoutParams(width, width)
 
-            return CustomViewHolder(imageview)
-        }//onCreateViewHolder
+            return CustomViewHolder(imageView)
+        }
 
-        inner class CustomViewHolder(var imageview: ImageView): RecyclerView.ViewHolder(imageview)
-
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            var imageview = (holder as CustomViewHolder).imageview
-            Glide.with(holder.itemView.context).load(contentDTOs[position].imageUrl).apply(
-                RequestOptions().centerCrop()).into(imageview)
-        }//onBindViewHolder
-
-        override fun getItemCount(): Int {
-            return contentDTOs.size
-        }//getItemCount
-    }//inner class
-}//class
+        inner class CustomViewHolder(var imageView: ImageView): RecyclerView.ViewHolder(imageView)
+        //[END inner class CustomViewHolder,  override fun onCreateViewHolder]
+    }
+//[END 라사이클러뷰 어댑터/홀더]
+}
