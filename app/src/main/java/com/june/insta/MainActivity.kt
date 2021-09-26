@@ -105,6 +105,28 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     }
 //[END 네비게이션]
 
+//[START onActivityResult : UserFragment 에서 프로필 사진을 선택한 응답을 처리]
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == UserFragment.PICK_PROFILE_FROM_ALBUM && resultCode == Activity.RESULT_OK){
+            var imageUri = data?.data
+            var uid = FirebaseAuth.getInstance().currentUser?.uid
+            //uid 가 파일명
+            var storageRef = FirebaseStorage.getInstance().reference.child("userProfileImages").child(uid!!)
+
+            storageRef.putFile(imageUri!!).continueWithTask { task: Task<UploadTask.TaskSnapshot> ->
+                return@continueWithTask storageRef.downloadUrl
+            }.addOnSuccessListener { uri ->
+                var map = HashMap<String, Any>()
+                map["image"] = uri.toString()
+                FirebaseFirestore.getInstance().collection("profileImages").document(uid).set(map)
+            }
+        }
+    }
+//[END onActivityResult]
+
+
+//[START 사용함수]
     //인스타 타이틀 보이기, 백버튼&유저네임 숨김.
     private fun setToolbarDefault(){
         toolbar_username.visibility = View.GONE
@@ -123,27 +145,10 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             FirebaseFirestore.getInstance().collection("pushtokens").document(uid!!).set(map)
         }
     }//registerPushToken
+//[END 사용함수]
 
 //    override fun onStop() {
 //        super.onStop()
 //        FcmPush.instance.sendMessage("gyQsSR6D5RhHWpDJsyCTPx0XpJ02","hi", "bye")
 //    }
-
-    //UserFragment 에서 프로필 사진을 선택한 응답을 처리
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == UserFragment.PICK_PROFILE_FROM_ALBUM && resultCode == Activity.RESULT_OK){
-            var imageUri = data?.data
-            var uid = FirebaseAuth.getInstance().currentUser?.uid
-            //uid 가 파일명
-            var storageRef = FirebaseStorage.getInstance().reference.child("userProfileImages").child(uid!!)
-            storageRef.putFile(imageUri!!).continueWithTask { task: Task<UploadTask.TaskSnapshot> ->
-                return@continueWithTask storageRef.downloadUrl
-            }.addOnSuccessListener { uri ->
-                var map = HashMap<String, Any>()
-                map["image"] = uri.toString()
-                FirebaseFirestore.getInstance().collection("profileImages").document(uid).set(map)
-            }
-        }
-    }//onActivityResult
 }

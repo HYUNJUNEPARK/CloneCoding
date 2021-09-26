@@ -20,7 +20,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.june.insta.LoginActivity
 import com.june.insta.MainActivity
 import com.june.insta.R
-import com.june.insta.databinding.FragmentDetailBinding
 import com.june.insta.databinding.FragmentUserBinding
 import com.june.insta.navigation.model.AlarmDTO
 import com.june.insta.navigation.model.ContentDTO
@@ -38,7 +37,7 @@ class UserFragment : Fragment() {
     var firestore : FirebaseFirestore? = null
     var uid : String? = null
     var auth : FirebaseAuth? = null
-    var currentUserUid : String? = null
+    private var currentUserUid : String? = null
 
     //static 변수라서 MainActivity 에서도 접근 가능
     companion object {
@@ -72,7 +71,7 @@ class UserFragment : Fragment() {
             binding.accountIvProfile?.setOnClickListener {
                 Log.d("checkLog","Profile Image Clicked")
 
-                var photoPickerIntent = Intent(Intent.ACTION_PICK)
+                val photoPickerIntent = Intent(Intent.ACTION_PICK)
                 photoPickerIntent.type = "image/*"
 
                 activity?.startActivityForResult(photoPickerIntent, PICK_PROFILE_FROM_ALBUM)
@@ -90,7 +89,7 @@ class UserFragment : Fragment() {
             }
 
             //UserFragment 에서 MainActivity 의 XML 요소를 잡기 위해 변수 초기화
-            var mainActivity = (activity as MainActivity)
+            val mainActivity = (activity as MainActivity)
             //인스타 타이틀 숨김, 백버튼&유저이름 보이기
             mainActivity.binding.toolbarTitleImage?.visibility = View.GONE
             mainActivity.binding.toolbarUsername?.visibility = View.VISIBLE
@@ -111,13 +110,13 @@ class UserFragment : Fragment() {
     }
 //[START onCreateView]
 
-//[START onViewCreated]
+//[START onViewCreated : 프로필 이미지 세팅, 팔로우/팔로잉 카운팅]
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         getProfileImage(view)
         getFollowerAndFollowing(view)
     }
-//[END onViewCreated]
+//[END onViewCreated : 프로필 이미지 세팅, 팔로우/팔로잉 카운팅]
 
 //[START onDestroyView]
     override fun onDestroyView() {
@@ -126,83 +125,143 @@ class UserFragment : Fragment() {
     }
 //[END onDestroyView]
 
+
+//[START 라사이클러뷰 어댑터/홀더]
+    inner class UserFragmentRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+        private var contentDTOs : ArrayList<ContentDTO> = arrayListOf()
+
+        init {
+            //DB 에서 내가 올린 이미지 데이터만 읽어 옴
+            firestore?.collection("images")?.whereEqualTo("uid",uid)?.addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+                if(querySnapshot == null) return@addSnapshotListener
+
+                for(snapshot in querySnapshot.documents){
+                    contentDTOs.add(snapshot.toObject(ContentDTO::class.java)!!)
+                }
+
+                binding.accountTvPostCount?.text = contentDTOs.size.toString()
+                notifyDataSetChanged()
+            }
+        }
+        //[1. START 바인딩뷰홀더 : 아이템뷰에 들어갈 정보 배치]
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+            val imageView = (holder as CustomViewHolder).imageView
+            Glide.with(holder.itemView.context).load(contentDTOs[position].imageUrl).apply(RequestOptions().centerCrop()).into(imageView)
+        }
+        //[1. END 바인딩뷰홀더 : 아이템뷰에 들어갈 정보 배치]
+
+        //[2. START getItemCount]
+        override fun getItemCount(): Int {
+            return contentDTOs.size
+        }
+        //[2. END getItemCount]
+
+        //[3. START inner class CustomViewHolder,  override fun onCreateViewHolder 를 만든 것은 메모리를 적게 사용하기 위한 약속]
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+            //화면 넓이의 1/3 값을 가져와 이미지를 넣어줄 준비
+            val width = resources.displayMetrics.widthPixels / 3
+            val imageView = ImageView(parent.context)
+            imageView.layoutParams = LinearLayoutCompat.LayoutParams(width, width)
+
+            return CustomViewHolder(imageView)
+        }
+        inner class CustomViewHolder(var imageView: ImageView): RecyclerView.ViewHolder(imageView)
+        //[3. END inner class CustomViewHolder,  override fun onCreateViewHolder]
+    }
+//[END 라사이클러뷰 어댑터/홀더]
+
 //[START 사용 함수]
-    fun followerAlarm(destinationUid : String){
+    //[1. START 팔로워 알람]
+    private fun followerAlarm(destinationUid : String){
         var alarmDTO = AlarmDTO()
         alarmDTO.destinationUid = destinationUid
         alarmDTO.userId = auth?.currentUser?.email
         alarmDTO.uid = auth?.currentUser?.uid
         alarmDTO.kind = 2
         alarmDTO.timestamp = System.currentTimeMillis()
+
         FirebaseFirestore.getInstance().collection("alarms").document().set(alarmDTO)
-
-        var message = auth?.currentUser?.email + getString(R.string.alarm_follow)
+        val message = auth?.currentUser?.email + getString(R.string.alarm_follow)
         FcmPush.instance.sendMessage(destinationUid, "test favoriteAlarm", message)
-    }//followerAlarm
+    }
+    //[1. END 팔로워 알람]
 
-    fun getProfileImage(view: View){
+    //[2. START 파이어베이스 DB 에서 프로필 이미지 불러옴]
+    private fun getProfileImage(view: View){
         firestore?.collection("profileImages")?.document(uid!!)?.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
             if(documentSnapshot == null) return@addSnapshotListener
+
             if(documentSnapshot.data != null){
-                var url = documentSnapshot?.data!!["image"]
-                Glide.with(requireContext()).load(url).apply(RequestOptions().circleCrop()).into(view?.account_iv_profile!!)
+                val url = documentSnapshot?.data!!["image"]
+                Glide.with(requireContext()).load(url).apply(RequestOptions().circleCrop()).into(binding.accountIvProfile)
+            } else {
+                Log.d("checkLog", "Firebase Exception : $firebaseFirestoreException")
             }
         }
-    }//getProfileImage
+    }
+    //[2. END 파이어베이스 DB 에서 프로필 이미지 불러옴]
 
-    //화면에 Follow/Following 카운팅 & Follow/Follow Cancel 전환
-    fun getFollowerAndFollowing(view: View) {
-            firestore?.collection("users")?.document(uid!!)?.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
+    //[3. START 팔로우/팔로잉 카운팅 & 팔로우/팔로우 취소 전환]
+    private fun getFollowerAndFollowing(view: View) {
+        firestore?.collection("users")?.document(uid!!)?.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
             if (documentSnapshot == null) return@addSnapshotListener
+
             var followDTO = documentSnapshot.toObject(FollowDTO::class.java)
+
+            //'팔로잉' 이 있다면 카운팅을 화면에 반영
             if (followDTO?.followingCount != null) {
-                view?.account_tv_following_count?.text = followDTO?.followingCount?.toString()
+                binding.accountTvFollowingCount?.text = followDTO?.followingCount?.toString()
             }
+
+            //'팔로우' 가 있다면
             if (followDTO?.followerCount != null) {
-                view?.account_tv_follower_count?.text = followDTO?.followerCount?.toString()
-                //팔로우를 하고 있으면 버튼이 바뀌는 코드
+                //카운팅을 화면에 반영
+                binding.accountTvFollowerCount?.text = followDTO?.followerCount?.toString()
+
+                //팔로우 취소 활성화
                 if (followDTO?.followers?.containsKey(currentUserUid!!)) {
-                    view?.account_btn_follow_signout?.text = getString(R.string.follow_cancel)
-                    view?.account_btn_follow_signout?.background?.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorLightGray), PorterDuff.Mode.MULTIPLY)
-                } else {
-                    if (uid != currentUserUid) {
-                        view?.account_btn_follow_signout?.text = getString(R.string.follow)
-                        view?.account_btn_follow_signout?.background?.colorFilter = null
+                    binding.accountBtnFollowSignout?.text = getString(R.string.follow_cancel)
+                    binding.accountBtnFollowSignout?.background?.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorLightGray), PorterDuff.Mode.MULTIPLY)
+                }else{
+                    if(uid != currentUserUid) {
+                        binding.accountBtnFollowSignout?.text = getString(R.string.follow)
+                        binding.accountBtnFollowSignout?.background?.colorFilter = null
                     }
                 }
             }
         }
-    }//getFollowerAndFollowing
+    }
+    //[3. END 팔로우/팔로잉 카운팅 & 팔로우/팔로우 취소 전환]
 
-    //Follow 버튼 눌렀을 때
-    fun requestFollow(){
-        //Save data to my account
-        var tsDocFollowing = firestore?.collection("users")?.document(currentUserUid!!)
+    //[4. START 팔로우 버튼을 눌렀을 때]
+    private fun requestFollow(){
+        val tsDocFollowing = firestore?.collection("users")?.document(currentUserUid!!)
+
         firestore?.runTransaction { transaction ->
             var followDTO = transaction.get(tsDocFollowing!!).toObject(FollowDTO::class.java)
+
             if(followDTO == null){
                 followDTO = FollowDTO()
                 followDTO!!.followingCount = 1
                 followDTO!!.followings[uid!!] = true
-
-                transaction.set(tsDocFollowing,followDTO!!)
+                transaction.set(tsDocFollowing, followDTO!!)
                 return@runTransaction
             }
+
             if(followDTO.followings.containsKey(uid)){
-                //It remove following third person when a third person follow me
                 followDTO?.followingCount = followDTO?.followingCount - 1
                 followDTO?.followings.remove(uid)
             }else{
-                //It add following third person when a third person do not follow me
                 followDTO?.followingCount = followDTO?.followingCount + 1
                 followDTO?.followings[uid!!] = true
             }
+
             transaction.set(tsDocFollowing,followDTO)
             return@runTransaction
         }
 
-        //Save data to third account
-        var tsDocFollower = firestore?.collection("users")?.document(uid!!)
+        val tsDocFollower = firestore?.collection("users")?.document(uid!!)
+
         firestore?.runTransaction { transaction ->
             var followDTO = transaction.get(tsDocFollower!!).toObject(FollowDTO::class.java)
             if(followDTO == null){
@@ -214,11 +273,9 @@ class UserFragment : Fragment() {
                 return@runTransaction
             }
             if(followDTO!!.followers.containsKey(currentUserUid!!)){
-                //It cancel my follower when I follow a third person
                 followDTO!!.followerCount = followDTO!!.followerCount - 1
                 followDTO!!.followers.remove(currentUserUid!!)
             }else{
-                //It add my follower when I don't follow a third person
                 followDTO!!.followerCount = followDTO!!.followerCount + 1
                 followDTO!!.followers[currentUserUid!!] = true
                 followerAlarm(uid!!)
@@ -227,46 +284,6 @@ class UserFragment : Fragment() {
             return@runTransaction
         }
     }
+    //[4. END 팔로우 버튼을 눌렀을 때]
 //[END 사용 함수]
-
-    inner class UserFragmentRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
-        var contentDTOs : ArrayList<ContentDTO> = arrayListOf()
-
-        init {
-            //DB 에서 내가 올린 이미지 데이터만 읽어 옴
-            firestore?.collection("images")?.whereEqualTo("uid",uid)?.addSnapshotListener { querySnapshot, firebaseFirestoreException ->
-                if(querySnapshot == null) return@addSnapshotListener
-
-                for(snapshot in querySnapshot.documents){
-                    contentDTOs.add(snapshot.toObject(ContentDTO::class.java)!!)
-                }
-                //사용자가 올린 전체 POST 수
-                fragmentView?.account_tv_post_count?.text = contentDTOs.size.toString()
-                //리사이클러뷰 새로고침
-                notifyDataSetChanged()
-            }
-        }//init
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            //화면 넓이의 1/3 값을 가져와 이미지를 넣어줄 준비
-            var width = resources.displayMetrics.widthPixels / 3
-            var imageview = ImageView(parent.context)
-            imageview.layoutParams = LinearLayoutCompat.LayoutParams(width, width)
-
-            return CustomViewHolder(imageview)
-        }//onCreateViewHolder
-
-        inner class CustomViewHolder(var imageview: ImageView): RecyclerView.ViewHolder(imageview)
-
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            var imageview = (holder as CustomViewHolder).imageview
-            Glide.with(holder.itemView.context).load(contentDTOs[position].imageUrl).apply(RequestOptions().centerCrop()).into(imageview)
-        }
-
-        //
-        override fun getItemCount(): Int {
-            return contentDTOs.size
-        }
-        //
-    }
 }

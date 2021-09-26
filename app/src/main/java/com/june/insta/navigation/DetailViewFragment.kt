@@ -72,7 +72,7 @@ class DetailViewFragment : Fragment() {
                 }
         }
 
-    //[START 리사이클러뷰 오버라이딩]
+        //[START 리사이클러뷰 오버라이딩]
         //[1. START 바인딩뷰홀더 : 아이템뷰에 들어갈 정보 배치]
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             var viewHolder = (holder as CustomViewHolder).binding
@@ -128,12 +128,12 @@ class DetailViewFragment : Fragment() {
             var binding = ItemDetailBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             return CustomViewHolder(binding)
         }
-
         inner class CustomViewHolder(val binding: ItemDetailBinding) : RecyclerView.ViewHolder(binding.root)
         //[3. END inner class CustomViewHolder,  override fun onCreateViewHolder]
-    //[END 리사이클러뷰 오버라이딩]
 
-    //[START 바인딩뷰홀더에서 사용되는 함수 : 좋아요 이벤트]
+        //[END 리사이클러뷰 오버라이딩]
+
+        //[START 바인딩뷰홀더에서 사용되는 함수 : 좋아요 이벤트]
         //[1. START 좋아요 카운팅 세팅]
         private fun favoriteEvent(position : Int){
             var tsDoc = firestore?.collection("images")?.document(contentUidList[position])
@@ -168,7 +168,7 @@ class DetailViewFragment : Fragment() {
             FcmPush.instance.sendMessage(destinationUid, "test favoriteAlarm", message)
         }
         //[2. END 좋아요 알람]
+        //[END 바인딩뷰홀더에서 사용되는 함수 : 좋아요 이벤트]
     }
-    //[END 바인딩뷰홀더에서 사용되는 함수 : 좋아요 이벤트]
-}
 //END 라사이클러뷰 어댑터/홀더]
+}
