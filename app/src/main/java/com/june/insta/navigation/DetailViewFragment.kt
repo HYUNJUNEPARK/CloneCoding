@@ -3,6 +3,7 @@ package com.june.insta.navigation
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -81,19 +82,22 @@ class DetailViewFragment : Fragment() {
             viewHolder.detailviewitemFavoritecounterTextview.text = "좋아요 " + contentDTOs!![position].favoriteCount+"개"
             Glide.with(holder.itemView.context).load(contentDTOs!![position].imageUrl).into(viewHolder.detailviewitemImageviewContent)
 
-            viewHolder.detailviewitemFavoriteImageview.setOnClickListener {
-                favoriteEvent(position)
-            }
-
-            //1-1. '좋아요' 클릭 -> 하트색 변경 (검 <-> 흰)
+            //하트색(검 <-> 흰)
             if(contentDTOs!![position].favorites.containsKey(uid)){ view
                 viewHolder.detailviewitemFavoriteImageview.setImageResource(R.drawable.ic_favorite)
             }else{
                 viewHolder.detailviewitemFavoriteImageview.setImageResource(R.drawable.ic_favorite_border)
             }
 
+            //1-1. '좋아요' 클릭 -> 좋아요 수 세팅
+            viewHolder.detailviewitemFavoriteImageview.setOnClickListener {
+                Log.d("checkLog","Like Button Clicked")
+                favoriteEvent(position)
+            }
+
             //1-2. 프로필 이미지가 클릭 -> UserFragment 로 이동
             viewHolder.detailviewitemProfileImage.setOnClickListener {
+                Log.d("checkLog","Profile Image Clicked")
                 var fragment = UserFragment()
                 var bundle = Bundle()
                 bundle.putString("destinationUid", contentDTOs[position].uid)
@@ -104,6 +108,7 @@ class DetailViewFragment : Fragment() {
 
             //1-3. 코멘트 이미지가 클릭 -> CommentActivity 로 이동
             viewHolder.detailviewitemCommentImageview.setOnClickListener { v ->
+                Log.d("checkLog","Comment Button Clicked")
                 var intent = Intent(v.context, CommentActivity::class.java)
                 intent.putExtra("contentUid", contentUidList[position])
                 intent.putExtra("destinationUid", contentDTOs[position].uid)
@@ -132,6 +137,7 @@ class DetailViewFragment : Fragment() {
         //[1. START 좋아요 카운팅 세팅]
         private fun favoriteEvent(position : Int){
             var tsDoc = firestore?.collection("images")?.document(contentUidList[position])
+
             firestore?.runTransaction { transaction ->
                 var contentDTO = transaction.get(tsDoc!!).toObject(ContentDTO::class.java)
 

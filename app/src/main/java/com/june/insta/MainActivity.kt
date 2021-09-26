@@ -25,7 +25,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
     //[Variation For ViewBinding]
-    private lateinit var binding : ActivityMainBinding
+    lateinit var binding : ActivityMainBinding
 
 //[START onCreate]
     override fun onCreate(savedInstanceState: Bundle?) {

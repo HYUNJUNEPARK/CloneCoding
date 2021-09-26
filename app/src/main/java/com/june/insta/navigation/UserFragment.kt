@@ -20,6 +20,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.june.insta.LoginActivity
 import com.june.insta.MainActivity
 import com.june.insta.R
+import com.june.insta.databinding.FragmentDetailBinding
+import com.june.insta.databinding.FragmentUserBinding
 import com.june.insta.navigation.model.AlarmDTO
 import com.june.insta.navigation.model.ContentDTO
 import com.june.insta.navigation.model.FollowDTO
@@ -28,61 +30,84 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_user.view.*
 
 class UserFragment : Fragment() {
-
+    //[Variation for Fragment ViewBinding]
+    private var _binding : FragmentUserBinding? = null
+    private val binding get() = _binding!!
 
     var fragmentView : View? = null
     var firestore : FirebaseFirestore? = null
     var uid : String? = null
     var auth : FirebaseAuth? = null
     var currentUserUid : String? = null
+
     //static 변수라서 MainActivity 에서도 접근 가능
     companion object {
         var PICK_PROFILE_FROM_ALBUM = 10
     }
+
 //[START onCreateView]
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var fragmentView = LayoutInflater.from(activity).inflate(R.layout.fragment_user, container, false)
+        _binding = FragmentUserBinding.inflate(inflater, container, false)
+
         //이전 화면에서 넘어온 uid 을 받아옴
         uid = arguments?.getString("destinationUid")
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
         currentUserUid = auth?.currentUser?.uid
 
+        //[START uid 에 따른 UserFragment 세팅(if-else)]
+        //1. 내가 내 유저페이지를 보는 경우
         if (uid == currentUserUid){
-            //내가 내 페이지를 보는 경우 -> SIGN OUT 활성화
-            fragmentView?.account_btn_follow_signout?.text = getString(R.string.signout)
-            fragmentView?.account_btn_follow_signout?.setOnClickListener {
+            //로그아웃 활성화
+            binding.accountBtnFollowSignout?.text = getString(R.string.signout)
+
+            //로그아웃 버튼 클릭 -> LoginActivity 로 이동
+            binding.accountBtnFollowSignout?.setOnClickListener {
+                Log.d("checkLog","Logout Button Clicked")
                 activity?.finish()
                 startActivity(Intent(activity, LoginActivity::class.java))
             }
-        }else{
-            //남이 내 페이지를 보는 경우 -> Follow 버튼 활성화, 백버튼 누르면 네비게이션바에 있는 홈버튼이 작동
-            //인스타 타이틀 숨김, 백버튼&유저네임 보이기(디폴트 : 인스타 타이틀 보이기, 백버튼&유저네임 숨김)
-            fragmentView?.account_btn_follow_signout?.text = getString(R.string.follow)
-            var mainactivity = (activity as MainActivity)
-            mainactivity?.toolbar_username?.text = arguments?.getString("userId")
-            mainactivity?.toolbar_btn_back?.setOnClickListener {
-                mainactivity.bottom_navigation.selectedItemId = R.id.action_home
+
+            //프로필 이미지 클릭 -> 갤러리 오픈
+            binding.accountIvProfile?.setOnClickListener {
+                Log.d("checkLog","Profile Image Clicked")
+
+                var photoPickerIntent = Intent(Intent.ACTION_PICK)
+                photoPickerIntent.type = "image/*"
+
+                activity?.startActivityForResult(photoPickerIntent, PICK_PROFILE_FROM_ALBUM)
             }
-            mainactivity?.toolbar_title_image?.visibility = View.GONE
-            mainactivity?.toolbar_username?.visibility = View.VISIBLE
-            mainactivity?.toolbar_btn_back?.visibility = View.VISIBLE
-            //
-            fragmentView?.account_btn_follow_signout?.setOnClickListener {
+
+        //2. 다른 사람의 유저페이지를 보는 경우
+        }else{
+            //팔로우 버튼 활성화
+            binding.accountBtnFollowSignout?.text = getString(R.string.follow)
+
+            //팔로우 버튼 클릭
+            binding.accountBtnFollowSignout.setOnClickListener {
+                Log.d("checkLog","Follow Button Clicked")
                 requestFollow()
             }
-        }//else
-        fragmentView?.account_recyclerview?.adapter = UserFragmentRecyclerViewAdapter()
-        fragmentView?.account_recyclerview?.layoutManager = GridLayoutManager(activity, 3)
-        //사용자가 프로필 사진을 클릭 -> 이미지 디렉토리에서 고른 사진을 MainActivity onActivityResult 에서 받음
-        fragmentView?.account_iv_profile?.setOnClickListener {
-            var photoPickerIntent = Intent(Intent.ACTION_PICK)
-            photoPickerIntent.type = "image/*"
 
-            //MainActivity onActivityResult 에서 처리
-            activity?.startActivityForResult(photoPickerIntent, PICK_PROFILE_FROM_ALBUM)
+            //UserFragment 에서 MainActivity 의 XML 요소를 잡기 위해 변수 초기화
+            var mainActivity = (activity as MainActivity)
+            //인스타 타이틀 숨김, 백버튼&유저이름 보이기
+            mainActivity.binding.toolbarTitleImage?.visibility = View.GONE
+            mainActivity.binding.toolbarUsername?.visibility = View.VISIBLE
+            mainActivity.binding.toolbarBtnBack?.visibility = View.VISIBLE
+            mainActivity.binding.toolbarUsername?.text = arguments?.getString("userId")
+
+            //백버튼 클릭 -> DetailFragment 로 이동
+            mainActivity.binding.toolbarBtnBack?.setOnClickListener {
+                mainActivity.binding.bottomNavigation.selectedItemId = R.id.action_home
+            }
         }
-        return fragmentView
+        //[END uid 에 따른 UserFragment 세팅(if-else)]
+
+        binding.accountRecyclerview?.adapter = UserFragmentRecyclerViewAdapter()
+        binding.accountRecyclerview?.layoutManager = GridLayoutManager(activity, 3)
+
+        return binding.root
     }
 //[START onCreateView]
 
@@ -93,6 +118,13 @@ class UserFragment : Fragment() {
         getFollowerAndFollowing(view)
     }
 //[END onViewCreated]
+
+//[START onDestroyView]
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+//[END onDestroyView]
 
 //[START 사용 함수]
     fun followerAlarm(destinationUid : String){
@@ -229,10 +261,12 @@ class UserFragment : Fragment() {
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             var imageview = (holder as CustomViewHolder).imageview
             Glide.with(holder.itemView.context).load(contentDTOs[position].imageUrl).apply(RequestOptions().centerCrop()).into(imageview)
-        }//onBindViewHolder
+        }
 
+        //
         override fun getItemCount(): Int {
             return contentDTOs.size
         }
+        //
     }
 }
