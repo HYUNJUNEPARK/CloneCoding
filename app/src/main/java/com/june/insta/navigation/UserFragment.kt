@@ -47,7 +47,7 @@ class UserFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentUserBinding.inflate(inflater, container, false)
 
-        //이전 화면에서 넘어온 uid 을 받아옴
+        //DetailViewFragment 에서 넘어온 uid 을 받아옴
         uid = arguments?.getString("destinationUid")
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
@@ -107,7 +107,7 @@ class UserFragment : Fragment() {
 
         return binding.root
     }
-//[START onCreateView]
+//[END onCreateView]
 
 //[START onViewCreated : 프로필 이미지 세팅, 팔로우/팔로잉 카운팅]
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -72,31 +72,31 @@ class DetailViewFragment : Fragment() {
                 }
         }
 
-        //[START 리사이클러뷰 오버라이딩]
+    //[START 리사이클러뷰 오버라이딩]
         //[1. START 바인딩뷰홀더 : 아이템뷰에 들어갈 정보 배치]
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            var viewHolder = (holder as CustomViewHolder).binding
+            var viewHolderBinding = (holder as CustomViewHolder).binding
 
-            viewHolder.detailviewitemProfileTextview.text = contentDTOs!![position].userId
-            viewHolder.detailviewitemExplainTextview.text = contentDTOs!![position].explain
-            viewHolder.detailviewitemFavoritecounterTextview.text = "좋아요 " + contentDTOs!![position].favoriteCount+"개"
-            Glide.with(holder.itemView.context).load(contentDTOs!![position].imageUrl).into(viewHolder.detailviewitemImageviewContent)
+            viewHolderBinding.detailviewitemProfileTextview.text = contentDTOs!![position].userId
+            viewHolderBinding.detailviewitemExplainTextview.text = contentDTOs!![position].explain
+            viewHolderBinding.detailviewitemFavoritecounterTextview.text = "좋아요 " + contentDTOs!![position].favoriteCount+"개"
+            Glide.with(holder.itemView.context).load(contentDTOs!![position].imageUrl).into(viewHolderBinding.detailviewitemImageviewContent)
 
             //하트색(검 <-> 흰)
             if(contentDTOs!![position].favorites.containsKey(uid)){ view
-                viewHolder.detailviewitemFavoriteImageview.setImageResource(R.drawable.ic_favorite)
+                viewHolderBinding.detailviewitemFavoriteImageview.setImageResource(R.drawable.ic_favorite)
             }else{
-                viewHolder.detailviewitemFavoriteImageview.setImageResource(R.drawable.ic_favorite_border)
+                viewHolderBinding.detailviewitemFavoriteImageview.setImageResource(R.drawable.ic_favorite_border)
             }
 
             //1-1. '좋아요' 클릭 -> 좋아요 수 세팅
-            viewHolder.detailviewitemFavoriteImageview.setOnClickListener {
+            viewHolderBinding.detailviewitemFavoriteImageview.setOnClickListener {
                 Log.d("checkLog","Like Button Clicked")
                 favoriteEvent(position)
             }
 
             //1-2. 프로필 이미지가 클릭 -> UserFragment 로 이동
-            viewHolder.detailviewitemProfileImage.setOnClickListener {
+            viewHolderBinding.detailviewitemProfileImage.setOnClickListener {
                 Log.d("checkLog","Profile Image Clicked")
                 var fragment = UserFragment()
                 var bundle = Bundle()
@@ -107,7 +107,7 @@ class DetailViewFragment : Fragment() {
             }
 
             //1-3. 코멘트 이미지가 클릭 -> CommentActivity 로 이동
-            viewHolder.detailviewitemCommentImageview.setOnClickListener { v ->
+            viewHolderBinding.detailviewitemCommentImageview.setOnClickListener { v ->
                 Log.d("checkLog","Comment Button Clicked")
                 var intent = Intent(v.context, CommentActivity::class.java)
                 intent.putExtra("contentUid", contentUidList[position])
@@ -130,10 +130,9 @@ class DetailViewFragment : Fragment() {
         }
         inner class CustomViewHolder(val binding: ItemDetailBinding) : RecyclerView.ViewHolder(binding.root)
         //[3. END inner class CustomViewHolder,  override fun onCreateViewHolder]
+    //[END 리사이클러뷰 오버라이딩]
 
-        //[END 리사이클러뷰 오버라이딩]
-
-        //[START 바인딩뷰홀더에서 사용되는 함수 : 좋아요 이벤트]
+    //[START 바인딩뷰홀더에서 사용되는 함수 : 좋아요 이벤트]
         //[1. START 좋아요 카운팅 세팅]
         private fun favoriteEvent(position : Int){
             var tsDoc = firestore?.collection("images")?.document(contentUidList[position])
@@ -168,7 +167,7 @@ class DetailViewFragment : Fragment() {
             FcmPush.instance.sendMessage(destinationUid, "test favoriteAlarm", message)
         }
         //[2. END 좋아요 알람]
-        //[END 바인딩뷰홀더에서 사용되는 함수 : 좋아요 이벤트]
+    //[END 바인딩뷰홀더에서 사용되는 함수 : 좋아요 이벤트]
     }
 //END 라사이클러뷰 어댑터/홀더]
 }
