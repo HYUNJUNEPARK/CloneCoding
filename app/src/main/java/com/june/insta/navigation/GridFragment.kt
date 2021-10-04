@@ -14,7 +14,6 @@ import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.firestore.FirebaseFirestore
 import com.june.insta.databinding.FragmentGridBinding
 import com.june.insta.navigation.model.ContentDTO
-import kotlinx.android.synthetic.main.fragment_grid.view.*
 
 class GridFragment : Fragment() {
     //[Variation for Fragment ViewBinding]

@@ -25,8 +25,7 @@ import com.june.insta.navigation.model.AlarmDTO
 import com.june.insta.navigation.model.ContentDTO
 import com.june.insta.navigation.model.FollowDTO
 import com.june.insta.navigation.util.FcmPush
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_user.view.*
+
 
 class UserFragment : Fragment() {
     //[Variation for Fragment ViewBinding]

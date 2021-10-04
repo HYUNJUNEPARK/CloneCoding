@@ -25,13 +25,14 @@
     </LinearLayout>
 
     <!--메인 이미지-->
-    <ImageView
-        android:id="@+id/detailviewitem_imageview_content"
-        android:scaleType="fitXY"
-        android:layout_width="match_parent"
-        android:layout_height="250dp"/>
 
     <!--좋아요/댓글-->
+    <ImageView
+        android:id="@+id/detailviewitem_imageview_content"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:scaleType="fitXY" />
+
     <LinearLayout
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"

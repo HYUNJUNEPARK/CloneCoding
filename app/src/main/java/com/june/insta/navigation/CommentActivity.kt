@@ -19,8 +19,6 @@ import com.june.insta.databinding.ItemCommentBinding
 import com.june.insta.navigation.model.AlarmDTO
 import com.june.insta.navigation.model.ContentDTO
 import com.june.insta.navigation.util.FcmPush
-import kotlinx.android.synthetic.main.activity_comment.*
-import kotlinx.android.synthetic.main.item_comment.view.*
 import java.sql.Date
 import java.util.*
 import kotlin.collections.ArrayList

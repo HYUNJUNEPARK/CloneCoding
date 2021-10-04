@@ -15,8 +15,6 @@ import com.june.insta.R
 import com.june.insta.databinding.FragmentAlarmBinding
 import com.june.insta.databinding.ItemCommentBinding
 import com.june.insta.navigation.model.AlarmDTO
-import kotlinx.android.synthetic.main.fragment_alarm.view.*
-import kotlinx.android.synthetic.main.item_comment.view.*
 import java.sql.Date
 import java.text.SimpleDateFormat
 

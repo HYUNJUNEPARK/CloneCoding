@@ -20,8 +20,6 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import com.june.insta.databinding.ActivityMainBinding
 import com.june.insta.navigation.*
-import kotlinx.android.synthetic.main.activity_main.*
-
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
     //[Variation For ViewBinding]
@@ -129,10 +127,10 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 //[START 사용함수]
     //인스타 타이틀 보이기, 백버튼&유저네임 숨김.
     private fun setToolbarDefault(){
-        toolbar_username.visibility = View.GONE
-        toolbar_btn_back.visibility = View.GONE
-        toolbar_title_image.visibility = View.VISIBLE
-    }//setToolbarDefault
+        binding.toolbarBtnBack.visibility = View.GONE
+        binding.toolbarUsername.visibility = View.GONE
+        binding.toolbarTitleImage.visibility = View.VISIBLE
+    }
 
     private fun registerPushToken(){
         FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener {
@@ -144,7 +142,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
             FirebaseFirestore.getInstance().collection("pushtokens").document(uid!!).set(map)
         }
-    }//registerPushToken
+    }
 //[END 사용함수]
 
 //    override fun onStop() {

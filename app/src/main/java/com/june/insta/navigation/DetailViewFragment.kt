@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -20,8 +21,6 @@ import com.june.insta.databinding.ItemDetailBinding
 import com.june.insta.navigation.model.AlarmDTO
 import com.june.insta.navigation.model.ContentDTO
 import com.june.insta.navigation.util.FcmPush
-import kotlinx.android.synthetic.main.fragment_detail.view.*
-import kotlinx.android.synthetic.main.item_detail.view.*
 
 class DetailViewFragment : Fragment() {
     //[Variation for Fragment ViewBinding]
@@ -41,6 +40,7 @@ class DetailViewFragment : Fragment() {
         binding.detailviewfragmentRecyclerview.adapter = DetailViewRecyclerViewAdapter()
         binding.detailviewfragmentRecyclerview.layoutManager = LinearLayoutManager(activity)
 
+
         return binding.root
     }
 //[END onCreateView]
@@ -58,6 +58,7 @@ class DetailViewFragment : Fragment() {
         private var contentUidList: ArrayList<String> = arrayListOf()
 
         init {
+            //게시글 'DESCENDING 속성' 부여로 가장 최근 게시글이 맨 위에 업로드
             firestore?.collection("images")?.orderBy("timestamp", Query.Direction.DESCENDING)?.addSnapshotListener { querySnapshot, firebaseFirestoreException ->
                     contentDTOs.clear()
                     contentUidList.clear()
@@ -79,7 +80,19 @@ class DetailViewFragment : Fragment() {
             viewHolderBinding.detailviewitemProfileTextview.text = contentDTOs!![position].userId
             viewHolderBinding.detailviewitemExplainTextview.text = contentDTOs!![position].explain
             viewHolderBinding.detailviewitemFavoritecounterTextview.text = "좋아요 " + contentDTOs!![position].favoriteCount+"개"
-            Glide.with(holder.itemView.context).load(contentDTOs!![position].imageUrl).into(viewHolderBinding.detailviewitemImageviewContent)
+
+            //프로필 이미지 세팅
+            FirebaseFirestore.getInstance().collection("profileImages").document(contentDTOs[position].uid!!).get().addOnCompleteListener { task->
+                if (task.isSuccessful){
+                    val url = task.result["image"]
+
+                    Glide.with(this@DetailViewFragment).load(url).apply(RequestOptions().circleCrop()).into(viewHolderBinding.detailviewitemProfileImage)
+                }
+
+            }
+
+            //게시글 메인 이미지 세팅
+            Glide.with(this@DetailViewFragment).load(contentDTOs!![position].imageUrl).into(viewHolderBinding.detailviewitemImageviewContent)
 
             //하트색(검 <-> 흰)
             if(contentDTOs!![position].favorites.containsKey(uid)){ view
