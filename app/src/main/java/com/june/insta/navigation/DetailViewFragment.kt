@@ -30,7 +30,6 @@ class DetailViewFragment : Fragment() {
 
     //[Variation for using firebase]
     var firestore: FirebaseFirestore? = null
-
     var uid : String? = null
 
 //[START onCreateView]

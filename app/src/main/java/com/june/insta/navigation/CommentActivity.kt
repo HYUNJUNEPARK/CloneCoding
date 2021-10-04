@@ -90,9 +90,9 @@ class CommentActivity : AppCompatActivity() {
 
             //Long 타입으로 저장된 시간 데이터 -> 년월일 데이터 변환
             val timestamp = comments[position].timestamp
-            val data = Date(timestamp!!)
+            val date = Date(timestamp!!)
             val dateFormat = SimpleDateFormat("yy-MM-dd")
-            val strDate: String = dateFormat.format(data)
+            val strDate: String = dateFormat.format(date)
             viewHolderBinding.commentviewitemTextviewDate.text = strDate
 
             viewHolderBinding.commentviewitemTextviewComment.text = comments[position].comment
