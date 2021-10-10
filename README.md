@@ -14,3 +14,9 @@
 11 UserFragment 에서 타인이 내 프로필을 클릭했을 때 수정가능했던 오류를 수정(UserFragment.kt)<br/>
 12 게시글에 달린 댓글 볼 때 댓글을 단 날짜 표기<br/>
 13 알람에 알람이 도착한 날짜 표기<br/>
+
+
+** 참고 링크  **<br/>
+파이어베이스 공식 문서 : https://firebase.google.com/docs/auth/android/google-signin?hl=ko<br/>
+뷰바인딩 참고 페이지(Activity/Fragment) : https://duckssi.tistory.com/42<br/>
+리사이클러뷰 바인딩 참고 페이지 : https://ichi.pro/ko/recyclerview-eodaebteoeseo-byu-bainding-eul-sayonghaneun-bangbeob-272785073792906<br/>
