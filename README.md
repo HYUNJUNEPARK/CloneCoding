@@ -1,7 +1,7 @@
 # Instagram2
 
 '인스타그램 클론코딩' 의 버그 수정과 일부 기능을 추가한 안드로이드 앱
-google-services.json를 삭제 했기 때문에 정상 작동 안될 수 있음
+\google-services.json를 삭제 했기 때문에 정상 작동 안될 수 있음
 
 ** 개선 및 수정 사항 **<br/>
 1 UI 구성 중 '이메일 로그인' 과 '이메일 회원가입' 을 분할해 재구성(activity_login.xml)<br/>
