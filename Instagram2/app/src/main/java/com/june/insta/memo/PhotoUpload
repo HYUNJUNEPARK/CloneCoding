@@ -1,0 +1,22 @@
+** 사전 준비 **
+build.gradle(...app) 에 implementation 'com.google.firebase:firebase-storage:16.0.5' 추가  -> 이대로 하면 문제가 발생함
+manifests 에 스토리지 접근을 할 수 있도록 <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/> 추가
+파이어베이스 Build -> Storage -> Get Started 로 스토리지 활성화
+
+** 업로드 절차 **
+- AddPhotoActivity 가 열렸을 때 -
+1. Activity 가 열릴 때(onCreate) 암묵적 인텐트에 requestCode 를 넣어서 보냄
+-> 안드로이드 기기 내 이미지를 처리할 수 있는 Activity 가 뜨는데 여기서 이미지를 선택하면 requestCode, resultCode, data를 받을 수 있음
+2. 1. 과정에서 받은 매개변수를 onActivityResult 가 처리하는데 requestCode 와 resultCode 가 정상적으로 왔다면, 이미지 data 를 Uri 형식으로 변수에 담고 레이아웃에 띄움
+- 업로드 버튼을 눌렀을 때 -
+3. 파이어베이스에 올릴 파일의 이름과 디렉토리 이름을 정함. 여기서 onCreate 에서 초기화한 FirebaseStorage 인스턴스가 사용됨
+
+** 문제 발생과 해결 **
+문제) 파이어베이스에 업로드가 안되는 문제가 발생
+해결) dependencies 의 firebase-auth 와 firebase-storage 를 같은 버전을 바꿨더니 해결됨
+>> 기존
+implementation 'com.google.firebase:firebase-auth:21.0.1'
+implementation 'com.google.firebase:firebase-storage:16.0.5'
+>> 수정
+implementation 'com.google.firebase:firebase-auth:18.0.0'
+implementation 'com.google.firebase:firebase-storage:18.0.0'
