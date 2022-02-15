@@ -1,0 +1,32 @@
+**  Firestore Database 사용 절차 **
+1. 라이브러리 다운
+2. Firebase 에서 Firestore Database 생성과 Rule 수정
+Build -> Firestore database -> Create database -> Start in test mode -> Rules 규칙을 아래와 같이 수정(권한에 유저 아이디 정보가 있어야만 읽고 쓰기를 허용)
+match /{document=**} {
+  allow read, write: if
+      request.auth.uid != null;
+}
+3. Firestore Database 에 업로드 할 데이터를 DTO 방식에 맞춰 넣어주고 Callback method 나 Promise method 중 가독성이 높은 형식으로 업로드
+//Collback method
+storageRef?.putFile(photoUri!!)?.addOnSuccessListener {
+    storageRef.downloadUrl.addOnSuccessListener { uri ->
+    ...
+    }
+}
+//Promise method
+storageRef?.putFile(photoUri!!)?.continueWithTask { task: Task<UploadTask.TaskSnapshot> ->
+    return@continueWithTask storageRef.downloadUrl
+    }?.addOnSuccessListener { uri ->
+    ...
+    }
+}
+
+** 문제 발생과 해결 **
+문제) Storage 에 이미지는 올라가지만 Firestore Database 에 디렉토리 생성과 업로드가 되지 않음
+해결) 라이브러리를 최신 버전으로 바꿔줌
+Tools -> Firebase -> Cloud Firestore -> Get started with Cloud Firestore [Kotlin]
+-> Add Cloud Firestore to your app 에서 최신 라이브러리로 바꿔줌
+>> 기존
+implementation 'com.google.firebase:firebase-firestore:18.0.0'
+>> 수정
+implementation 'com.google.firebase:firebase-firestore-ktx:23.0.3'

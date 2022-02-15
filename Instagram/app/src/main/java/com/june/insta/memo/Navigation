@@ -1,0 +1,23 @@
+1. XML 에 네비게이션 뷰를 만들고 속성과 menu 를 연결
+1) XML 에 <com.google.android.material.bottomnavigation.BottomNavigationView/> 로 시작되는 네이게이션 뷰를 만듬
+2) app:itemBackground="@color/...", app:itemIconTint="@color/...", app:itemTextColor="@color/..." 로 네이게이션 바 UI 속성 만들어줌
+3) app:menu="@menu/..." 로 네이게이션바에서 띄워줄 아이템 정보를 담고 있는 XML 파일을 연결
+
+2. 아이템 정보를 담고 있는 xml 파일 생성
+1) res 우클릭 -> New ->  Android Resource File > file name 작성 , Resource type은 Menu로 설정
+-> rest 하위 디렉토리에 Menu 패키지가 생기고 내부에 만든 파일이 있음 (@menu/file.xml)
+2) menu 파일에 네이게이션바에 들어갈 기능 수 만큼 <item /> 을 만들어 줌
+기본 속성으로는 android:icon="@drawable/...", android:enabled="true", android:title="@string/..." 등을 만들어줌
+
+3. fragment 생성
+네이게이션 바 기능마다 그에 해당하는 class fragment 를 만들어주고 override fun onCreateView 내부에서 layout과 연결하고 반환
+override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    var view = LayoutInflater.from(activity).inflate(R.layout.fragment_layout_name, container, false)
+    return view
+}
+
+5. Activity 에 만든 fragment 연결
+1) 네이게이션 바를 생성할 클래스에 네이게이션뷰를 상속해줌(class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener)
+2) onCreate 내부에 '네이게이션바가 달릴 뷰 아이디'.setOnNavigationItemSelectedListener(this) 을 만들어줌
+3) onNavigationItemSelected 를 override 해주고 when(item.item.id){ ... } 로 menu item 의 id 가 넘어올 때마다 반응할 기능을 만들어 줌
+(이 과정에 fragment를 달아줌)
